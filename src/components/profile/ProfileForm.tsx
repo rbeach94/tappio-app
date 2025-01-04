@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tables } from "@/integrations/supabase/types";
 import { ColorPicker } from "./ColorPicker";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 
@@ -22,6 +22,7 @@ export const ProfileForm = ({
   showColorPicker,
   setShowColorPicker 
 }: ProfileFormProps) => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [localProfile, setLocalProfile] = useState(profile);
 
   const handleChange = (updates: Partial<Tables<"nfc_profiles">>) => {
@@ -38,16 +39,33 @@ export const ProfileForm = ({
     <div className="flex items-center space-x-2">
       <Icon className="h-5 w-5 text-gray-500" />
       <Input
-        value={localProfile[field] || ''}
-        onChange={(e) => setLocalProfile(prev => ({ ...prev, [field]: e.target.value }))}
+        name={field}
+        defaultValue={profile[field] || ''}
         placeholder={`${label} URL`}
         className="flex-1 text-black"
       />
     </div>
   );
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formRef.current) return;
+
+    const formData = new FormData(formRef.current);
+    const updates = {
+      facebook_url: formData.get('facebook_url'),
+      instagram_url: formData.get('instagram_url'),
+      twitter_url: formData.get('twitter_url'),
+      youtube_url: formData.get('youtube_url'),
+      linkedin_url: formData.get('linkedin_url'),
+    };
+
+    handleChange(updates);
+    handleSave();
+  };
+
   return (
-    <div className="space-y-6 py-12">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="full_name">Full Name</Label>
@@ -160,12 +178,12 @@ export const ProfileForm = ({
       </div>
 
       <Button 
-        onClick={handleSave}
+        type="submit"
         className="w-full"
         variant="outline"
       >
         Save Changes
       </Button>
-    </div>
+    </form>
   );
 };
