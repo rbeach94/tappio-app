@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tables } from "@/integrations/supabase/types";
 
+type ProfileButton = Tables<"profile_buttons">;
+type NewProfileButton = Pick<ProfileButton, 'label' | 'action_type' | 'action_value' | 'profile_id'>;
+
 export const useProfileButtons = (profileId: string) => {
   const queryClient = useQueryClient();
 
@@ -26,12 +29,12 @@ export const useProfileButtons = (profileId: string) => {
   });
 
   const addButton = useMutation({
-    mutationFn: async (buttonData: Partial<Tables<"profile_buttons">>) => {
+    mutationFn: async (buttonData: NewProfileButton) => {
       const { error } = await supabase
         .from('profile_buttons')
         .insert({
-          profile_id: profileId,
           ...buttonData,
+          profile_id: profileId,
           sort_order: buttons?.length || 0,
         });
       if (error) throw error;
@@ -65,7 +68,7 @@ export const useProfileButtons = (profileId: string) => {
   });
 
   const reorderButtons = useMutation({
-    mutationFn: async (updates: Tables<"profile_buttons">[]) => {
+    mutationFn: async (updates: ProfileButton[]) => {
       const { error } = await supabase
         .from('profile_buttons')
         .upsert(

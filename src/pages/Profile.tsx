@@ -41,9 +41,9 @@ const Profile = () => {
 
   const handleFormSubmit = async (formData: FormData) => {
     const buttonData = {
-      label: formData.get('label'),
-      action_type: formData.get('action_type'),
-      action_value: formData.get('action_value'),
+      label: formData.get('label') as string,
+      action_type: formData.get('action_type') as string,
+      action_value: formData.get('action_value') as string,
     };
     addButton.mutate(buttonData);
   };
