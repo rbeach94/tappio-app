@@ -101,6 +101,29 @@ export const useProfileData = (id: string) => {
     },
   });
 
+  const reorderButtons = useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      const { error } = await supabase
+        .from('profile_buttons')
+        .upsert(
+          updates.map(({ id, sort_order }) => ({
+            id,
+            sort_order,
+            profile_id: id,
+          }))
+        );
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
+      toast.success("Buttons reordered successfully!");
+    },
+    onError: (error) => {
+      console.error('Error reordering buttons:', error);
+      toast.error("Failed to reorder buttons");
+    },
+  });
+
   return {
     profile,
     buttons,
@@ -109,5 +132,6 @@ export const useProfileData = (id: string) => {
     updateProfile,
     addButton,
     deleteButton,
+    reorderButtons,
   };
 };

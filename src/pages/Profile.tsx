@@ -8,6 +8,7 @@ import { ColorPickerSection } from "@/components/profile/ColorPickerSection";
 import { ButtonForm } from "@/components/profile/ButtonForm";
 import { LogoUpload } from "@/components/profile/LogoUpload";
 import { useProfileData } from "@/hooks/useProfileData";
+import { Tables } from "@/integrations/supabase/types";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,7 @@ const Profile = () => {
     updateProfile,
     addButton,
     deleteButton,
+    reorderButtons,
   } = useProfileData(id);
 
   const handleButtonClick = (button: any) => {
@@ -35,6 +37,24 @@ const Profile = () => {
         window.location.href = `tel:${button.action_value}`;
         break;
     }
+  };
+
+  const handleFormSubmit = async (formData: FormData) => {
+    const buttonData = {
+      label: formData.get('label'),
+      action_type: formData.get('action_type'),
+      action_value: formData.get('action_value'),
+    };
+    addButton.mutate(buttonData);
+  };
+
+  const handleReorder = (reorderedButtons: Tables<"profile_buttons">[]) => {
+    reorderButtons.mutate(
+      reorderedButtons.map((button, index) => ({
+        id: button.id,
+        sort_order: index,
+      }))
+    );
   };
 
   if (isLoading) {
@@ -53,22 +73,13 @@ const Profile = () => {
     );
   }
 
-  const handleFormSubmit = async (formData: FormData) => {
-    const buttonData = {
-      label: formData.get('label'),
-      action_type: formData.get('action_type'),
-      action_value: formData.get('action_value'),
-    };
-    addButton.mutate(buttonData);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto py-12 px-4">
         <div className="max-w-4xl mx-auto space-y-8">
           <ProfileHeader 
-            profile={profile} 
+            profile={profile}
             isLoading={isLoading}
             error={error}
           />
@@ -106,6 +117,7 @@ const Profile = () => {
                 buttonTextColor={profile.button_text_color || '#000000'}
                 onDelete={(buttonId) => deleteButton.mutate(buttonId)}
                 onButtonClick={handleButtonClick}
+                onReorder={handleReorder}
               />
             </div>
           </div>

@@ -5,6 +5,7 @@ import { Tables } from "@/integrations/supabase/types";
 import { ColorPicker } from "./ColorPicker";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, TiktokIcon } from "lucide-react";
 
 interface ProfileFormProps {
   profile: Tables<"nfc_profiles">;
@@ -30,6 +31,18 @@ export const ProfileForm = ({
   const handleSave = () => {
     onUpdate(localProfile);
   };
+
+  const SocialField = ({ icon: Icon, label, value, onChange }) => (
+    <div className="flex items-center space-x-2">
+      <Icon className="h-5 w-5 text-gray-500" />
+      <Input
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={`${label} URL`}
+        className="flex-1 text-black"
+      />
+    </div>
+  );
 
   return (
     <div className="space-y-6 py-12">
@@ -115,34 +128,43 @@ export const ProfileForm = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap -mx-1">
-        <ColorPicker
-          label="Background Color"
-          color={localProfile.background_color || '#15202B'}
-          onChange={(color) => handleChange({ background_color: color })}
-          isOpen={showColorPicker === 'background'}
-          onToggle={() => setShowColorPicker(showColorPicker === 'background' ? null : 'background')}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Social Media</h3>
+        <SocialField
+          icon={Facebook}
+          label="Facebook"
+          value={localProfile.facebook_url}
+          onChange={(value) => handleChange({ facebook_url: value })}
         />
-        <ColorPicker
-          label="Text Color"
-          color={localProfile.text_color || '#FFFFFF'}
-          onChange={(color) => handleChange({ text_color: color })}
-          isOpen={showColorPicker === 'text'}
-          onToggle={() => setShowColorPicker(showColorPicker === 'text' ? null : 'text')}
+        <SocialField
+          icon={Instagram}
+          label="Instagram"
+          value={localProfile.instagram_url}
+          onChange={(value) => handleChange({ instagram_url: value })}
         />
-        <ColorPicker
-          label="Button Color"
-          color={localProfile.button_color || '#8899ac'}
-          onChange={(color) => handleChange({ button_color: color })}
-          isOpen={showColorPicker === 'button'}
-          onToggle={() => setShowColorPicker(showColorPicker === 'button' ? null : 'button')}
+        <SocialField
+          icon={TiktokIcon}
+          label="TikTok"
+          value={localProfile.tiktok_url}
+          onChange={(value) => handleChange({ tiktok_url: value })}
         />
-        <ColorPicker
-          label="Button Text Color"
-          color={localProfile.button_text_color || '#000000'}
-          onChange={(color) => handleChange({ button_text_color: color })}
-          isOpen={showColorPicker === 'buttonText'}
-          onToggle={() => setShowColorPicker(showColorPicker === 'buttonText' ? null : 'buttonText')}
+        <SocialField
+          icon={Twitter}
+          label="X (Twitter)"
+          value={localProfile.twitter_url}
+          onChange={(value) => handleChange({ twitter_url: value })}
+        />
+        <SocialField
+          icon={Youtube}
+          label="YouTube"
+          value={localProfile.youtube_url}
+          onChange={(value) => handleChange({ youtube_url: value })}
+        />
+        <SocialField
+          icon={Linkedin}
+          label="LinkedIn"
+          value={localProfile.linkedin_url}
+          onChange={(value) => handleChange({ linkedin_url: value })}
         />
       </div>
 
