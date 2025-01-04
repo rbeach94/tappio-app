@@ -15,9 +15,12 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const [showColorPicker, setShowColorPicker] = useState<'background' | 'text' | 'button' | null>(null);
 
-  const { data: profile, isLoading } = useQuery({
+  console.log('Profile component mounted with id:', id); // Debug log
+
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ['profile', id],
     queryFn: async () => {
+      console.log('Fetching profile data for id:', id); // Debug log
       const { data, error } = await supabase
         .from('nfc_profiles')
         .select(`
@@ -33,9 +36,15 @@ const Profile = () => {
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error); // Debug log
+        throw error;
+      }
+      
+      console.log('Profile data received:', data); // Debug log
       return data;
     },
+    enabled: !!id, // Only run query if we have an ID
   });
 
   const updateProfile = useMutation({
@@ -160,24 +169,54 @@ END:VCARD`;
     document.body.removeChild(link);
   };
 
+  if (error) {
+    console.error('Error in profile component:', error); // Debug log
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Profile</h1>
+        <p className="text-gray-600 mb-4">There was an error loading your profile. Please try again later.</p>
+        <Button 
+          onClick={() => window.location.href = '/dashboard'}
+          variant="outline"
+        >
+          Return to Dashboard
+        </Button>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
   if (!profile) {
-    return <div>Profile not found</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
+        <p className="text-gray-600 mb-4">The profile you're looking for doesn't exist or you don't have permission to view it.</p>
+        <Button 
+          onClick={() => window.location.href = '/dashboard'}
+          variant="outline"
+        >
+          Return to Dashboard
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div 
       className="min-h-screen p-4"
       style={{
-        backgroundColor: profile.background_color,
-        color: profile.text_color,
+        backgroundColor: profile.background_color || '#ffffff',
+        color: profile.text_color || '#000000',
       }}
     >
       <div className="max-w-md mx-auto space-y-6">
