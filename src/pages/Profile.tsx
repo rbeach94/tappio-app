@@ -1,13 +1,14 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { ChromePicker } from 'react-color';
 import { useToast } from "@/hooks/use-toast";
+import { LogoUpload } from "@/components/profile/LogoUpload";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,12 +16,12 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const [showColorPicker, setShowColorPicker] = useState<'background' | 'text' | 'button' | null>(null);
 
-  console.log('Profile component mounted with id:', id); // Debug log
+  console.log('Profile component mounted with id:', id);
 
   const { data: profile, isLoading, error } = useQuery({
     queryKey: ['profile', id],
     queryFn: async () => {
-      console.log('Fetching profile data for id:', id); // Debug log
+      console.log('Fetching profile data for id:', id);
       const { data, error } = await supabase
         .from('nfc_profiles')
         .select(`
@@ -37,14 +38,14 @@ const Profile = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error); // Debug log
+        console.error('Error fetching profile:', error);
         throw error;
       }
       
-      console.log('Profile data received:', data); // Debug log
+      console.log('Profile data received:', data);
       return data;
     },
-    enabled: !!id, // Only run query if we have an ID
+    enabled: !!id,
   });
 
   const updateProfile = useMutation({
@@ -63,47 +64,6 @@ const Profile = () => {
       });
     },
   });
-
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${id}/${crypto.randomUUID()}.${fileExt}`;
-
-    try {
-      const { error: uploadError } = await supabase.storage
-        .from('Tappio Profiles')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        toast({
-          title: "Upload failed",
-          description: "Failed to upload logo. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('Tappio Profiles')
-        .getPublicUrl(fileName);
-
-      updateProfile.mutate({ logo_url: publicUrl });
-      
-      toast({
-        title: "Logo uploaded",
-        description: "Your logo has been updated successfully.",
-      });
-    } catch (error) {
-      console.error('Error uploading logo:', error);
-      toast({
-        title: "Upload failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const addButton = useMutation({
     mutationFn: async (buttonData: {
@@ -170,7 +130,6 @@ END:VCARD`;
   };
 
   if (error) {
-    console.error('Error in profile component:', error); // Debug log
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Profile</h1>
@@ -220,48 +179,11 @@ END:VCARD`;
       }}
     >
       <div className="max-w-md mx-auto space-y-6">
-        {/* Logo Upload */}
-        <div className="text-center">
-          {profile.logo_url ? (
-            <div className="relative group">
-              <img 
-                src={profile.logo_url} 
-                alt="Business Logo" 
-                className="w-32 h-32 mx-auto object-contain rounded-lg"
-              />
-              <label 
-                htmlFor="logo-upload"
-                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-lg"
-              >
-                <span className="text-white">Change Logo</span>
-              </label>
-              <input
-                id="logo-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-              />
-            </div>
-          ) : (
-            <div className="w-32 h-32 mx-auto border-2 border-dashed rounded-lg flex items-center justify-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-                id="logo-upload"
-              />
-              <label 
-                htmlFor="logo-upload"
-                className="cursor-pointer flex flex-col items-center"
-              >
-                <Plus className="w-8 h-8 mb-2" />
-                <span>Add Logo</span>
-              </label>
-            </div>
-          )}
-        </div>
+        <LogoUpload 
+          profileId={profile.id}
+          logoUrl={profile.logo_url}
+          onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
+        />
 
         {/* Profile Information */}
         <div className="space-y-4">
@@ -306,7 +228,6 @@ END:VCARD`;
           />
         </div>
 
-        {/* Save Contact Button */}
         <Button 
           onClick={generateVCard}
           className="w-full"
