@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Database, Users } from "lucide-react";
+import { Loader2, Plus, DatabaseIcon, Users } from "lucide-react";
 import { toast } from "sonner";
-import { Database } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
 type UserWithRole = {
   id: string;
@@ -144,7 +144,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Database className="w-5 h-5" />
+                <DatabaseIcon className="w-5 h-5" />
                 NFC Code Management
               </CardTitle>
             </CardHeader>
