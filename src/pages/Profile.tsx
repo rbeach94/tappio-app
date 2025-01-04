@@ -1,207 +1,58 @@
 import { useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { LogoUpload } from "@/components/profile/LogoUpload";
+import { Loader2 } from "lucide-react";
+import { Navigation } from "@/components/navigation/Navigation";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileButtons } from "@/components/profile/ProfileButtons";
-import { ButtonForm } from "@/components/profile/ButtonForm";
-import { Navigation } from "@/components/navigation/Navigation";
+import { ColorPickerSection } from "@/components/profile/ColorPickerSection";
+import { useProfileData } from "@/hooks/useProfileData";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
+  if (!id) return null;
 
-  // First query to fetch the profile
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ['profile', id],
-    queryFn: async () => {
-      console.log('Fetching profile data for id:', id);
-      const { data, error } = await supabase
-        .from('nfc_profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
+  const {
+    profile,
+    buttons,
+    isLoading,
+    error,
+    updateProfile,
+    addButton,
+    deleteButton,
+  } = useProfileData(id);
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
-      
-      return data;
-    },
-    enabled: !!id,
-  });
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
 
-  // Second query to fetch the buttons
-  const { data: buttons, isLoading: buttonsLoading, error: buttonsError } = useQuery({
-    queryKey: ['profile_buttons', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profile_buttons')
-        .select('*')
-        .eq('profile_id', id)
-        .order('sort_order', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching buttons:', error);
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  const isLoading = profileLoading || buttonsLoading;
-  const error = profileError || buttonsError;
-
-  const updateProfile = useMutation({
-    mutationFn: async (updates: any) => {
-      const { error } = await supabase
-        .from('nfc_profiles')
-        .update(updates)
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', id] });
-      toast({
-        title: "Profile updated",
-        description: "Your changes have been saved successfully.",
-      });
-    },
-  });
-
-  const addButton = useMutation({
-    mutationFn: async (buttonData: {
-      label: string;
-      action_type: 'link' | 'email' | 'call';
-      action_value: string;
-    }) => {
-      const { error } = await supabase
-        .from('profile_buttons')
-        .insert({
-          profile_id: id,
-          ...buttonData,
-          sort_order: buttons?.length || 0,
-        });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast({
-        title: "Button added",
-        description: "New button has been added successfully.",
-      });
-    },
-  });
-
-  const deleteButton = useMutation({
-    mutationFn: async (buttonId: string) => {
-      const { error } = await supabase
-        .from('profile_buttons')
-        .delete()
-        .eq('id', buttonId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast({
-        title: "Button deleted",
-        description: "The button has been removed successfully.",
-      });
-    },
-  });
-
-  const generateVCard = () => {
-    if (!profile) return;
-    
-    const vCard = `BEGIN:VCARD
-VERSION:3.0
-FN:${profile.full_name || ''}
-ORG:${profile.company || ''}
-TITLE:${profile.job_title || ''}
-TEL:${profile.phone || ''}
-EMAIL:${profile.email || ''}
-URL:${profile.website || ''}
-NOTE:${profile.bio || ''}
-END:VCARD`;
-
-    const blob = new Blob([vCard], { type: 'text/vcard' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${profile.full_name || 'contact'}.vcf`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleButtonClick = (button: any) => {
-    switch (button.action_type) {
-      case 'link':
-        window.open(button.action_value, '_blank');
-        break;
-      case 'email':
-        window.location.href = `mailto:${button.action_value}`;
-        break;
-      case 'call':
-        window.location.href = `tel:${button.action_value}`;
-        break;
-    }
-  };
-
-  const handleAddButton = (formData: FormData) => {
-    addButton.mutate({
-      label: formData.get('label') as string,
-      action_type: formData.get('action_type') as 'link' | 'email' | 'call',
-      action_value: formData.get('action_value') as string,
-    });
-  };
+  if (error || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-500">Error loading profile</p>
+      </div>
+    );
+  }
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
       <Navigation />
-      <ProfileHeader isLoading={isLoading} error={error as Error} />
-      
-      {profile && (
-        <div 
-          className="min-h-screen py-12"
-          style={{
-            backgroundColor: profile.background_color || '#15202B',
-            color: profile.text_color || '#FFFFFF',
-          }}
-        >
-          <div className="max-w-md mx-auto space-y-6 px-4">
-            <LogoUpload 
-              profileId={profile.id}
-              logoUrl={profile.logo_url}
-              onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
+      <div className="container mx-auto py-12 px-4">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <ProfileHeader profile={profile} />
+          
+          <div className="grid gap-8">
+            <ColorPickerSection
+              profile={profile}
+              onColorChange={(updates) => updateProfile.mutate(updates)}
             />
-
-            <Button 
-              onClick={generateVCard}
-              className="w-full"
-              style={{ 
-                backgroundColor: profile.button_color || '#8899ac',
-                color: profile.button_text_color || '#000000'
-              }}
-            >
-              Save My Contact
-            </Button>
 
             <ProfileForm
               profile={profile}
-              onUpdate={updateProfile.mutate}
-              onSave={generateVCard}
-              showColorPicker={showColorPicker}
-              setShowColorPicker={setShowColorPicker}
+              onSave={(updates) => updateProfile.mutate(updates)}
             />
 
             <ProfileButtons
@@ -209,18 +60,12 @@ END:VCARD`;
               buttonColor={profile.button_color || '#8899ac'}
               buttonTextColor={profile.button_text_color || '#000000'}
               onDelete={(buttonId) => deleteButton.mutate(buttonId)}
-              onButtonClick={handleButtonClick}
-            />
-
-            <ButtonForm
-              buttonColor={profile.button_color || '#8899ac'}
-              buttonTextColor={profile.button_text_color || '#000000'}
-              onSubmit={handleAddButton}
+              onAdd={(buttonData) => addButton.mutate(buttonData)}
             />
           </div>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 
