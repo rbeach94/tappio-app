@@ -24,10 +24,12 @@ export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
         });
 
         if (error) throw error;
-        
+
         if (data.user) {
+          console.log("Login successful, navigating to dashboard...");
           toast.success("Successfully logged in!");
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
+          return;
         }
       } else {
         const { data, error } = await supabase.auth.signUp({
