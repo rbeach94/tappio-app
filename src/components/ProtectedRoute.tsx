@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
   const { data: session } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -51,3 +51,5 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
 
   return <div className="page-transition">{children}</div>;
 };
+
+export default ProtectedRoute;
