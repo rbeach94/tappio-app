@@ -3,8 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tables } from "@/integrations/supabase/types";
 
-type ProfileButton = Tables<"profile_buttons">;
-type NewProfileButton = Pick<ProfileButton, 'label' | 'action_type' | 'action_value' | 'profile_id'>;
+export type ProfileButton = Tables<"profile_buttons">;
+export type NewProfileButton = {
+  label: string;
+  action_type: string;
+  action_value: string;
+  profile_id: string;
+};
 
 export const useProfileButtons = (profileId: string) => {
   const queryClient = useQueryClient();
@@ -34,7 +39,6 @@ export const useProfileButtons = (profileId: string) => {
         .from('profile_buttons')
         .insert({
           ...buttonData,
-          profile_id: profileId,
           sort_order: buttons?.length || 0,
         });
       if (error) throw error;
@@ -100,5 +104,6 @@ export const useProfileButtons = (profileId: string) => {
     addButton,
     deleteButton,
     reorderButtons,
+    isDeleting: deleteButton.isPending
   };
 };

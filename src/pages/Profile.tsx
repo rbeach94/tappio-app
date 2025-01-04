@@ -13,7 +13,7 @@ const Profile = () => {
     deleteButton,
     isLoading,
     isDeleting,
-  } = useProfileData();
+  } = useProfileData("your-profile-id"); // Make sure to pass the correct profile ID
 
   const handleAddButton = (buttonData: Omit<NewProfileButton, 'profile_id'>) => {
     if (!profile?.id) {
@@ -21,7 +21,7 @@ const Profile = () => {
       return;
     }
 
-    const newButton = {
+    const newButton: NewProfileButton = {
       ...buttonData,
       profile_id: profile.id,
     };
@@ -46,7 +46,7 @@ const Profile = () => {
           isLoading={addButton.isPending}
         />
         <ProfileButtons
-          buttons={buttons}
+          buttons={buttons || []}
           onDelete={handleDeleteButton}
           isDeleting={isDeleting}
         />
