@@ -4,6 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
+  user_roles: {
+    role: Database["public"]["Enums"]["app_role"];
+  }[];
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -26,7 +33,7 @@ const AdminDashboard = () => {
   });
 
   // Fetch all users for admin view
-  const { data: users, isLoading: usersLoading } = useQuery({
+  const { data: users, isLoading: usersLoading } = useQuery<Profile[]>({
     queryKey: ["users"],
     queryFn: async () => {
       const { data: profiles } = await supabase
@@ -38,7 +45,7 @@ const AdminDashboard = () => {
             role
           )
         `);
-      return profiles;
+      return profiles || [];
     },
     enabled: userRole === "admin",
   });
