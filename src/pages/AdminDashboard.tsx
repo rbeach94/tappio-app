@@ -6,10 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
-  user_roles: {
-    role: Database["public"]["Enums"]["app_role"];
-  }[];
+type UserWithRole = {
+  id: string;
+  email: string | null;
+  role: Database["public"]["Enums"]["app_role"] | null;
 };
 
 const AdminDashboard = () => {
@@ -32,20 +32,33 @@ const AdminDashboard = () => {
     },
   });
 
-  // Fetch all users for admin view
-  const { data: users, isLoading: usersLoading } = useQuery<Profile[]>({
+  // Fetch all users with their roles
+  const { data: users, isLoading: usersLoading } = useQuery<UserWithRole[]>({
     queryKey: ["users"],
     queryFn: async () => {
-      const { data: profiles } = await supabase
+      const { data: profiles, error } = await supabase
         .from("profiles")
         .select(`
           id,
-          email,
-          user_roles (
-            role
-          )
+          email
         `);
-      return profiles || [];
+
+      if (error) throw error;
+
+      // Fetch roles separately
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
+
+      // Combine profiles with roles
+      return (profiles || []).map(profile => {
+        const userRole = roles?.find(r => r.user_id === profile.id);
+        return {
+          id: profile.id,
+          email: profile.email,
+          role: userRole?.role || null
+        };
+      });
     },
     enabled: userRole === "admin",
   });
@@ -84,7 +97,7 @@ const AdminDashboard = () => {
                     <div>
                       <p className="font-medium">{user.email}</p>
                       <p className="text-sm text-muted-foreground">
-                        Role: {user.user_roles?.[0]?.role || "user"}
+                        Role: {user.role || "user"}
                       </p>
                     </div>
                   </div>

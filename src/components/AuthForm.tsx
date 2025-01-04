@@ -18,26 +18,31 @@ export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
 
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) throw error;
-
-        toast.success("Successfully logged in!");
-        navigate("/dashboard");
+        
+        if (data.user) {
+          toast.success("Successfully logged in!");
+          navigate("/dashboard");
+        }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
 
         if (error) throw error;
 
-        toast.success("Successfully signed up! Please check your email for verification.");
+        if (data.user) {
+          toast.success("Successfully signed up! Please check your email for verification.");
+        }
       }
     } catch (error: any) {
+      console.error("Auth error:", error);
       toast.error(error.message || "An error occurred");
     } finally {
       setIsLoading(false);
