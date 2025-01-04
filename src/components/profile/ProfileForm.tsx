@@ -23,15 +23,28 @@ export const ProfileForm = ({
   setShowColorPicker 
 }: ProfileFormProps) => {
   const formRef = useRef<HTMLFormElement>(null);
-  const [localProfile, setLocalProfile] = useState(profile);
 
-  const handleChange = (updates: Partial<Tables<"nfc_profiles">>) => {
-    setLocalProfile(prev => ({ ...prev, ...updates }));
-  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formRef.current) return;
 
-  const handleSave = () => {
-    console.log('Saving profile changes:', localProfile);
-    onUpdate(localProfile);
+    const formData = new FormData(formRef.current);
+    const updates: Partial<Tables<"nfc_profiles">> = {
+      full_name: formData.get('full_name')?.toString() || null,
+      job_title: formData.get('job_title')?.toString() || null,
+      company: formData.get('company')?.toString() || null,
+      email: formData.get('email')?.toString() || null,
+      phone: formData.get('phone')?.toString() || null,
+      website: formData.get('website')?.toString() || null,
+      bio: formData.get('bio')?.toString() || null,
+      facebook_url: formData.get('facebook_url')?.toString() || null,
+      instagram_url: formData.get('instagram_url')?.toString() || null,
+      twitter_url: formData.get('twitter_url')?.toString() || null,
+      youtube_url: formData.get('youtube_url')?.toString() || null,
+      linkedin_url: formData.get('linkedin_url')?.toString() || null,
+    };
+
+    onUpdate(updates);
     onSave();
   };
 
@@ -47,23 +60,6 @@ export const ProfileForm = ({
     </div>
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formRef.current) return;
-
-    const formData = new FormData(formRef.current);
-    const updates: Partial<Tables<"nfc_profiles">> = {
-      facebook_url: formData.get('facebook_url')?.toString() || null,
-      instagram_url: formData.get('instagram_url')?.toString() || null,
-      twitter_url: formData.get('twitter_url')?.toString() || null,
-      youtube_url: formData.get('youtube_url')?.toString() || null,
-      linkedin_url: formData.get('linkedin_url')?.toString() || null,
-    };
-
-    handleChange(updates);
-    handleSave();
-  };
-
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
       <div className="space-y-4">
@@ -71,8 +67,8 @@ export const ProfileForm = ({
           <Label htmlFor="full_name">Full Name</Label>
           <Input
             id="full_name"
-            value={localProfile.full_name || ''}
-            onChange={(e) => handleChange({ full_name: e.target.value })}
+            name="full_name"
+            defaultValue={profile.full_name || ''}
             placeholder="Full Name"
             className="text-black"
           />
@@ -82,8 +78,8 @@ export const ProfileForm = ({
           <Label htmlFor="job_title">Job Title</Label>
           <Input
             id="job_title"
-            value={localProfile.job_title || ''}
-            onChange={(e) => handleChange({ job_title: e.target.value })}
+            name="job_title"
+            defaultValue={profile.job_title || ''}
             placeholder="Job Title"
             className="text-black"
           />
@@ -93,8 +89,8 @@ export const ProfileForm = ({
           <Label htmlFor="company">Company</Label>
           <Input
             id="company"
-            value={localProfile.company || ''}
-            onChange={(e) => handleChange({ company: e.target.value })}
+            name="company"
+            defaultValue={profile.company || ''}
             placeholder="Company"
             className="text-black"
           />
@@ -104,8 +100,8 @@ export const ProfileForm = ({
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
-            value={localProfile.email || ''}
-            onChange={(e) => handleChange({ email: e.target.value })}
+            name="email"
+            defaultValue={profile.email || ''}
             placeholder="Email"
             type="email"
             className="text-black"
@@ -116,8 +112,8 @@ export const ProfileForm = ({
           <Label htmlFor="phone">Phone</Label>
           <Input
             id="phone"
-            value={localProfile.phone || ''}
-            onChange={(e) => handleChange({ phone: e.target.value })}
+            name="phone"
+            defaultValue={profile.phone || ''}
             placeholder="Phone"
             type="tel"
             className="text-black"
@@ -128,8 +124,8 @@ export const ProfileForm = ({
           <Label htmlFor="website">Website</Label>
           <Input
             id="website"
-            value={localProfile.website || ''}
-            onChange={(e) => handleChange({ website: e.target.value })}
+            name="website"
+            defaultValue={profile.website || ''}
             placeholder="Website"
             type="url"
             className="text-black"
@@ -140,8 +136,8 @@ export const ProfileForm = ({
           <Label htmlFor="bio">Bio</Label>
           <Textarea
             id="bio"
-            value={localProfile.bio || ''}
-            onChange={(e) => handleChange({ bio: e.target.value })}
+            name="bio"
+            defaultValue={profile.bio || ''}
             placeholder="Add your bio here..."
             className="min-h-[100px] text-black"
           />
