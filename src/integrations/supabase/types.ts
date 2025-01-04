@@ -9,6 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      nfc_codes: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Relationships: []
+      }
+      nfc_profiles: {
+        Row: {
+          code_id: string
+          company: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          job_title: string | null
+          linkedin_url: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          code_id: string
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          job_title?: string | null
+          linkedin_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          code_id?: string
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          job_title?: string | null
+          linkedin_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nfc_profiles_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           email: string | null
@@ -50,7 +133,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_nfc_codes: {
+        Args: {
+          count: number
+          admin_id: string
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_to: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+        }[]
+      }
+      generate_unique_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "user"
