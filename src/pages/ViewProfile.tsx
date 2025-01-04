@@ -3,6 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProfileHeader } from "@/components/profile/view/ProfileHeader";
+import { SaveContactButton } from "@/components/profile/view/SaveContactButton";
+import { ProfileButtons } from "@/components/profile/view/ProfileButtons";
+import { ProfileBio } from "@/components/profile/view/ProfileBio";
 
 const ViewProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,30 +41,6 @@ const ViewProfile = () => {
     },
     enabled: !!id,
   });
-
-  const generateVCard = () => {
-    if (!profile) return;
-    
-    const vCard = `BEGIN:VCARD
-VERSION:3.0
-FN:${profile.full_name || ''}
-ORG:${profile.company || ''}
-TITLE:${profile.job_title || ''}
-TEL:${profile.phone || ''}
-EMAIL:${profile.email || ''}
-URL:${profile.website || ''}
-NOTE:${profile.bio || ''}
-END:VCARD`;
-
-    const blob = new Blob([vCard], { type: 'text/vcard' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${profile.full_name || 'contact'}.vcf`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   if (error) {
     return (
@@ -112,74 +92,10 @@ END:VCARD`;
       }}
     >
       <div className="max-w-md mx-auto space-y-6">
-        {/* Logo */}
-        {profile.logo_url && (
-          <div className="text-center">
-            <img 
-              src={profile.logo_url} 
-              alt="Business Logo" 
-              className="w-32 h-32 mx-auto object-contain rounded-lg"
-            />
-          </div>
-        )}
-
-        {/* Profile Information */}
-        <div className="space-y-4 text-center">
-          <h1 className="text-2xl font-bold">{profile.full_name}</h1>
-          {profile.job_title && <p className="text-lg">{profile.job_title}</p>}
-          {profile.company && <p className="text-lg">{profile.company}</p>}
-          {profile.email && <p>{profile.email}</p>}
-          {profile.phone && <p>{profile.phone}</p>}
-          {profile.website && <p>{profile.website}</p>}
-        </div>
-
-        {/* Save Contact Button */}
-        <Button 
-          onClick={generateVCard}
-          className="w-full"
-          style={{ 
-            backgroundColor: profile.button_color || '#8899ac',
-            color: profile.button_text_color || '#FFFFFF'
-          }}
-        >
-          Save My Contact
-        </Button>
-
-        {/* Custom Buttons */}
-        <div className="space-y-4">
-          {profile.profile_buttons?.map((button) => (
-            <Button
-              key={button.id}
-              className="w-full"
-              style={{ 
-                backgroundColor: profile.button_color || '#8899ac',
-                color: profile.button_text_color || '#FFFFFF'
-              }}
-              onClick={() => {
-                switch (button.action_type) {
-                  case 'link':
-                    window.open(button.action_value, '_blank');
-                    break;
-                  case 'email':
-                    window.location.href = `mailto:${button.action_value}`;
-                    break;
-                  case 'call':
-                    window.location.href = `tel:${button.action_value}`;
-                    break;
-                }
-              }}
-            >
-              {button.label}
-            </Button>
-          ))}
-        </div>
-
-        {/* Bio */}
-        {profile.bio && (
-          <div className="prose max-w-none">
-            <p>{profile.bio}</p>
-          </div>
-        )}
+        <ProfileHeader profile={profile} />
+        <SaveContactButton profile={profile} />
+        <ProfileButtons profile={profile} buttons={profile.profile_buttons} />
+        <ProfileBio bio={profile.bio} />
       </div>
     </div>
   );
