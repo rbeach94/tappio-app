@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Plus, DatabaseIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import AvailableCodesTable from "@/components/admin/AvailableCodesTable";
 
 type UserWithRole = {
   id: string;
@@ -14,12 +15,13 @@ type UserWithRole = {
   role: Database["public"]["Enums"]["app_role"] | null;
 };
 
-type NFCCode = {
+export type NFCCode = {
   id: string;
   code: string;
   created_at: string;
   assigned_to: string | null;
   assigned_at: string | null;
+  url: string | null;
 };
 
 const AdminDashboard = () => {
@@ -87,6 +89,32 @@ const AdminDashboard = () => {
     },
     enabled: userRole === "admin",
   });
+
+  const handleDownloadCSV = () => {
+    if (!nfcCodes) return;
+
+    const availableCodes = nfcCodes.filter(code => !code.assigned_to);
+    const csvContent = [
+      ["Code", "URL", "Created At"],
+      ...availableCodes.map(code => [
+        code.code,
+        code.url,
+        new Date(code.created_at).toLocaleDateString()
+      ])
+    ]
+      .map(row => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", `available-codes-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   // Generate codes mutation
   const generateCodesMutation = useMutation({
@@ -185,22 +213,12 @@ const AdminDashboard = () => {
                     Generate 100 Codes
                   </Button>
                 </div>
-                <div className="mt-4">
-                  <h3 className="mb-2 text-sm font-medium">Recent Codes</h3>
-                  <div className="space-y-2">
-                    {nfcCodes?.slice(0, 5).map((code) => (
-                      <div
-                        key={code.id}
-                        className="flex items-center justify-between p-3 text-sm border rounded-lg"
-                      >
-                        <span className="font-mono font-medium">{code.code}</span>
-                        <span className="text-muted-foreground">
-                          {code.assigned_to ? "Assigned" : "Available"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {nfcCodes && (
+                  <AvailableCodesTable 
+                    codes={nfcCodes} 
+                    onDownloadCSV={handleDownloadCSV}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>

@@ -18,6 +18,7 @@ export type Database = {
           created_by: string | null
           id: string
           is_active: boolean | null
+          url: string | null
         }
         Insert: {
           assigned_at?: string | null
@@ -27,6 +28,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_active?: boolean | null
+          url?: string | null
         }
         Update: {
           assigned_at?: string | null
@@ -36,6 +38,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_active?: boolean | null
+          url?: string | null
         }
         Relationships: []
       }
@@ -217,6 +220,7 @@ export type Database = {
           created_by: string | null
           id: string
           is_active: boolean | null
+          url: string | null
         }[]
       }
       generate_unique_code: {
