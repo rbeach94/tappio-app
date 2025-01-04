@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import ViewProfile from "./pages/ViewProfile";
 import AdminDashboard from "./pages/AdminDashboard";
+import CodeRedirect from "./pages/CodeRedirect";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/c/:code" element={<CodeRedirect />} />
           <Route
             path="/dashboard"
             element={
