@@ -55,6 +55,47 @@ const Profile = () => {
     },
   });
 
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${id}/${crypto.randomUUID()}.${fileExt}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('Tappio Profiles')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload logo. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('Tappio Profiles')
+        .getPublicUrl(fileName);
+
+      updateProfile.mutate({ logo_url: publicUrl });
+      
+      toast({
+        title: "Logo uploaded",
+        description: "Your logo has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast({
+        title: "Upload failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const addButton = useMutation({
     mutationFn: async (buttonData: {
       label: string;
@@ -95,33 +136,6 @@ const Profile = () => {
       });
     },
   });
-
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${id}/${crypto.randomUUID()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('logos')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload logo. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('logos')
-      .getPublicUrl(filePath);
-
-    updateProfile.mutate({ logo_url: publicUrl });
-  };
 
   const generateVCard = () => {
     if (!profile) return;
@@ -170,11 +184,26 @@ END:VCARD`;
         {/* Logo Upload */}
         <div className="text-center">
           {profile.logo_url ? (
-            <img 
-              src={profile.logo_url} 
-              alt="Business Logo" 
-              className="w-32 h-32 mx-auto object-contain"
-            />
+            <div className="relative group">
+              <img 
+                src={profile.logo_url} 
+                alt="Business Logo" 
+                className="w-32 h-32 mx-auto object-contain rounded-lg"
+              />
+              <label 
+                htmlFor="logo-upload"
+                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-lg"
+              >
+                <span className="text-white">Change Logo</span>
+              </label>
+              <input
+                id="logo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+            </div>
           ) : (
             <div className="w-32 h-32 mx-auto border-2 border-dashed rounded-lg flex items-center justify-center">
               <input
