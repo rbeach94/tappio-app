@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileHeader } from "@/components/profile/view/ProfileHeader";
 import { SaveContactButton } from "@/components/profile/view/SaveContactButton";
@@ -67,6 +67,35 @@ const ViewProfile = () => {
         <SaveContactButton profile={profile} />
         <ProfileButtons profile={profile} buttons={buttons} />
         <ProfileBio bio={profile.bio} />
+        
+        {/* Social Media Icons */}
+        <div className="flex justify-center gap-4 mt-6">
+          {profile.facebook_url && (
+            <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer">
+              <Facebook className="w-6 h-6" />
+            </a>
+          )}
+          {profile.instagram_url && (
+            <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer">
+              <Instagram className="w-6 h-6" />
+            </a>
+          )}
+          {profile.linkedin_url && (
+            <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+              <Linkedin className="w-6 h-6" />
+            </a>
+          )}
+          {profile.twitter_url && (
+            <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer">
+              <Twitter className="w-6 h-6" />
+            </a>
+          )}
+          {profile.youtube_url && (
+            <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer">
+              <Youtube className="w-6 h-6" />
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
