@@ -49,16 +49,21 @@ export type Database = {
           company: string | null
           created_at: string
           email: string | null
+          facebook_url: string | null
           full_name: string | null
           id: string
+          instagram_url: string | null
           job_title: string | null
           linkedin_url: string | null
           logo_url: string | null
           phone: string | null
           text_color: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
           updated_at: string
           user_id: string
           website: string | null
+          youtube_url: string | null
         }
         Insert: {
           background_color?: string | null
@@ -69,16 +74,21 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string | null
+          facebook_url?: string | null
           full_name?: string | null
           id?: string
+          instagram_url?: string | null
           job_title?: string | null
           linkedin_url?: string | null
           logo_url?: string | null
           phone?: string | null
           text_color?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id: string
           website?: string | null
+          youtube_url?: string | null
         }
         Update: {
           background_color?: string | null
@@ -89,16 +99,21 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string | null
+          facebook_url?: string | null
           full_name?: string | null
           id?: string
+          instagram_url?: string | null
           job_title?: string | null
           linkedin_url?: string | null
           logo_url?: string | null
           phone?: string | null
           text_color?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id?: string
           website?: string | null
+          youtube_url?: string | null
         }
         Relationships: [
           {

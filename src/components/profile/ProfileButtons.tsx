@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Tables } from "@/integrations/supabase/types";
-import { DndContext, DragEndEvent, closestCenter } from "@/dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy, useSortable } from "@/dnd-kit/sortable";
-import { CSS } from "@/dnd-kit/utilities";
+import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
 interface ProfileButtonsProps {

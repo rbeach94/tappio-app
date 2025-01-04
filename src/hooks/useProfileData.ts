@@ -102,14 +102,17 @@ export const useProfileData = (id: string) => {
   });
 
   const reorderButtons = useMutation({
-    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+    mutationFn: async (updates: Tables<"profile_buttons">[]) => {
       const { error } = await supabase
         .from('profile_buttons')
         .upsert(
-          updates.map(({ id, sort_order }) => ({
-            id,
-            sort_order,
-            profile_id: id,
+          updates.map((button, index) => ({
+            id: button.id,
+            sort_order: index,
+            profile_id: button.profile_id,
+            label: button.label,
+            action_type: button.action_type,
+            action_value: button.action_value
           }))
         );
       if (error) throw error;

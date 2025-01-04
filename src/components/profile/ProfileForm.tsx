@@ -5,7 +5,7 @@ import { Tables } from "@/integrations/supabase/types";
 import { ColorPicker } from "./ColorPicker";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
-import { Facebook, Instagram, Linkedin, Twitter, Youtube, TiktokIcon } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 
 interface ProfileFormProps {
   profile: Tables<"nfc_profiles">;
@@ -141,12 +141,6 @@ export const ProfileForm = ({
           label="Instagram"
           value={localProfile.instagram_url}
           onChange={(value) => handleChange({ instagram_url: value })}
-        />
-        <SocialField
-          icon={TiktokIcon}
-          label="TikTok"
-          value={localProfile.tiktok_url}
-          onChange={(value) => handleChange({ tiktok_url: value })}
         />
         <SocialField
           icon={Twitter}
