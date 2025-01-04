@@ -43,6 +43,15 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
 
       {showColorPicker && (
         <ColorPicker
+          label={
+            showColorPicker === 'background'
+              ? 'Background Color'
+              : showColorPicker === 'text'
+              ? 'Text Color'
+              : showColorPicker === 'button'
+              ? 'Button Color'
+              : 'Button Text Color'
+          }
           color={
             showColorPicker === 'background'
               ? profile.background_color
@@ -64,6 +73,8 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
             };
             onColorChange(updates);
           }}
+          isOpen={true}
+          onToggle={() => setShowColorPicker(null)}
           onClose={() => setShowColorPicker(null)}
         />
       )}

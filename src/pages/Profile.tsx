@@ -21,6 +21,20 @@ const Profile = () => {
     deleteButton,
   } = useProfileData(id);
 
+  const handleButtonClick = (button: any) => {
+    switch (button.action_type) {
+      case 'link':
+        window.open(button.action_value, '_blank');
+        break;
+      case 'email':
+        window.location.href = `mailto:${button.action_value}`;
+        break;
+      case 'call':
+        window.location.href = `tel:${button.action_value}`;
+        break;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -42,7 +56,11 @@ const Profile = () => {
       <Navigation />
       <div className="container mx-auto py-12 px-4">
         <div className="max-w-4xl mx-auto space-y-8">
-          <ProfileHeader profile={profile} />
+          <ProfileHeader 
+            profile={profile} 
+            isLoading={isLoading}
+            error={error}
+          />
           
           <div className="grid gap-8">
             <ColorPickerSection
@@ -52,7 +70,10 @@ const Profile = () => {
 
             <ProfileForm
               profile={profile}
-              onSave={(updates) => updateProfile.mutate(updates)}
+              onUpdate={updateProfile.mutate}
+              onSave={() => {}}
+              showColorPicker={null}
+              setShowColorPicker={() => {}}
             />
 
             <ProfileButtons
@@ -61,6 +82,7 @@ const Profile = () => {
               buttonTextColor={profile.button_text_color || '#000000'}
               onDelete={(buttonId) => deleteButton.mutate(buttonId)}
               onAdd={(buttonData) => addButton.mutate(buttonData)}
+              onButtonClick={handleButtonClick}
             />
           </div>
         </div>
