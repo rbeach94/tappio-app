@@ -41,6 +41,9 @@ export type Database = {
       }
       nfc_profiles: {
         Row: {
+          background_color: string | null
+          bio: string | null
+          button_color: string | null
           code_id: string
           company: string | null
           created_at: string
@@ -49,12 +52,17 @@ export type Database = {
           id: string
           job_title: string | null
           linkedin_url: string | null
+          logo_url: string | null
           phone: string | null
+          text_color: string | null
           updated_at: string
           user_id: string
           website: string | null
         }
         Insert: {
+          background_color?: string | null
+          bio?: string | null
+          button_color?: string | null
           code_id: string
           company?: string | null
           created_at?: string
@@ -63,12 +71,17 @@ export type Database = {
           id?: string
           job_title?: string | null
           linkedin_url?: string | null
+          logo_url?: string | null
           phone?: string | null
+          text_color?: string | null
           updated_at?: string
           user_id: string
           website?: string | null
         }
         Update: {
+          background_color?: string | null
+          bio?: string | null
+          button_color?: string | null
           code_id?: string
           company?: string | null
           created_at?: string
@@ -77,7 +90,9 @@ export type Database = {
           id?: string
           job_title?: string | null
           linkedin_url?: string | null
+          logo_url?: string | null
           phone?: string | null
+          text_color?: string | null
           updated_at?: string
           user_id?: string
           website?: string | null
@@ -88,6 +103,44 @@ export type Database = {
             columns: ["code_id"]
             isOneToOne: false
             referencedRelation: "nfc_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_buttons: {
+        Row: {
+          action_type: string
+          action_value: string
+          created_at: string
+          id: string
+          label: string
+          profile_id: string | null
+          sort_order: number
+        }
+        Insert: {
+          action_type: string
+          action_value: string
+          created_at?: string
+          id?: string
+          label: string
+          profile_id?: string | null
+          sort_order?: number
+        }
+        Update: {
+          action_type?: string
+          action_value?: string
+          created_at?: string
+          id?: string
+          label?: string
+          profile_id?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_buttons_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_profiles"
             referencedColumns: ["id"]
           },
         ]
