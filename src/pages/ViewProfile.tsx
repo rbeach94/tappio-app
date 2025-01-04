@@ -43,19 +43,20 @@ const ViewProfile = () => {
     
     const vCard = `BEGIN:VCARD
 VERSION:3.0
-FN:${profile.full_name}
-ORG:${profile.company}
-TITLE:${profile.job_title}
-TEL:${profile.phone}
-EMAIL:${profile.email}
-URL:${profile.website}
+FN:${profile.full_name || ''}
+ORG:${profile.company || ''}
+TITLE:${profile.job_title || ''}
+TEL:${profile.phone || ''}
+EMAIL:${profile.email || ''}
+URL:${profile.website || ''}
+NOTE:${profile.bio || ''}
 END:VCARD`;
 
     const blob = new Blob([vCard], { type: 'text/vcard' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${profile.full_name}.vcf`);
+    link.setAttribute('download', `${profile.full_name || 'contact'}.vcf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -106,8 +107,8 @@ END:VCARD`;
     <div 
       className="min-h-screen p-4"
       style={{
-        backgroundColor: profile.background_color || '#ffffff',
-        color: profile.text_color || '#000000',
+        backgroundColor: profile.background_color || '#15202B',
+        color: profile.text_color || '#FFFFFF',
       }}
     >
       <div className="max-w-md mx-auto space-y-6">
@@ -136,7 +137,10 @@ END:VCARD`;
         <Button 
           onClick={generateVCard}
           className="w-full"
-          style={{ backgroundColor: profile.button_color }}
+          style={{ 
+            backgroundColor: profile.button_color || '#8899ac',
+            color: profile.button_text_color || '#FFFFFF'
+          }}
         >
           Save My Contact
         </Button>
@@ -147,7 +151,10 @@ END:VCARD`;
             <Button
               key={button.id}
               className="w-full"
-              style={{ backgroundColor: profile.button_color }}
+              style={{ 
+                backgroundColor: profile.button_color || '#8899ac',
+                color: profile.button_text_color || '#FFFFFF'
+              }}
               onClick={() => {
                 switch (button.action_type) {
                   case 'link':

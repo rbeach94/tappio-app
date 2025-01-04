@@ -3,18 +3,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { ChromePicker } from 'react-color';
 import { useToast } from "@/hooks/use-toast";
 import { LogoUpload } from "@/components/profile/LogoUpload";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showColorPicker, setShowColorPicker] = useState<'background' | 'text' | 'button' | null>(null);
+  const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
 
   console.log('Profile component mounted with id:', id);
 
@@ -111,19 +109,20 @@ const Profile = () => {
     
     const vCard = `BEGIN:VCARD
 VERSION:3.0
-FN:${profile.full_name}
-ORG:${profile.company}
-TITLE:${profile.job_title}
-TEL:${profile.phone}
-EMAIL:${profile.email}
-URL:${profile.website}
+FN:${profile.full_name || ''}
+ORG:${profile.company || ''}
+TITLE:${profile.job_title || ''}
+TEL:${profile.phone || ''}
+EMAIL:${profile.email || ''}
+URL:${profile.website || ''}
+NOTE:${profile.bio || ''}
 END:VCARD`;
 
     const blob = new Blob([vCard], { type: 'text/vcard' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${profile.full_name}.vcf`);
+    link.setAttribute('download', `${profile.full_name || 'contact'}.vcf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -174,8 +173,8 @@ END:VCARD`;
     <div 
       className="min-h-screen p-4"
       style={{
-        backgroundColor: profile.background_color || '#ffffff',
-        color: profile.text_color || '#000000',
+        backgroundColor: profile.background_color || '#15202B',
+        color: profile.text_color || '#FFFFFF',
       }}
     >
       <div className="max-w-md mx-auto space-y-6">
@@ -185,56 +184,24 @@ END:VCARD`;
           onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
         />
 
-        {/* Profile Information */}
-        <div className="space-y-4">
-          <Input
-            value={profile.full_name || ''}
-            onChange={(e) => updateProfile.mutate({ full_name: e.target.value })}
-            placeholder="Full Name"
-            className="text-black"
-          />
-          <Input
-            value={profile.job_title || ''}
-            onChange={(e) => updateProfile.mutate({ job_title: e.target.value })}
-            placeholder="Job Title"
-            className="text-black"
-          />
-          <Input
-            value={profile.company || ''}
-            onChange={(e) => updateProfile.mutate({ company: e.target.value })}
-            placeholder="Company"
-            className="text-black"
-          />
-          <Input
-            value={profile.email || ''}
-            onChange={(e) => updateProfile.mutate({ email: e.target.value })}
-            placeholder="Email"
-            type="email"
-            className="text-black"
-          />
-          <Input
-            value={profile.phone || ''}
-            onChange={(e) => updateProfile.mutate({ phone: e.target.value })}
-            placeholder="Phone"
-            type="tel"
-            className="text-black"
-          />
-          <Input
-            value={profile.website || ''}
-            onChange={(e) => updateProfile.mutate({ website: e.target.value })}
-            placeholder="Website"
-            type="url"
-            className="text-black"
-          />
-        </div>
-
         <Button 
           onClick={generateVCard}
           className="w-full"
-          style={{ backgroundColor: profile.button_color }}
+          style={{ 
+            backgroundColor: profile.button_color || '#8899ac',
+            color: profile.button_text_color || '#FFFFFF'
+          }}
         >
           Save My Contact
         </Button>
+
+        <ProfileForm
+          profile={profile}
+          onUpdate={updateProfile.mutate}
+          onSave={generateVCard}
+          showColorPicker={showColorPicker}
+          setShowColorPicker={setShowColorPicker}
+        />
 
         {/* Custom Buttons */}
         <div className="space-y-4">
@@ -242,7 +209,10 @@ END:VCARD`;
             <div key={button.id} className="flex gap-2">
               <Button
                 className="flex-1"
-                style={{ backgroundColor: profile.button_color }}
+                style={{ 
+                  backgroundColor: profile.button_color || '#8899ac',
+                  color: profile.button_text_color || '#FFFFFF'
+                }}
                 onClick={() => {
                   switch (button.action_type) {
                     case 'link':
@@ -290,70 +260,17 @@ END:VCARD`;
             <option value="call">Call</option>
           </select>
           <Input name="action_value" placeholder="URL/Email/Phone" required className="text-black" />
-          <Button type="submit" className="w-full">Add Button</Button>
+          <Button 
+            type="submit" 
+            className="w-full"
+            style={{ 
+              backgroundColor: profile.button_color || '#8899ac',
+              color: profile.button_text_color || '#FFFFFF'
+            }}
+          >
+            Add Button
+          </Button>
         </form>
-
-        {/* Bio */}
-        <Textarea
-          value={profile.bio || ''}
-          onChange={(e) => updateProfile.mutate({ bio: e.target.value })}
-          placeholder="Add your bio here..."
-          className="min-h-[100px] text-black"
-        />
-
-        {/* Color Pickers */}
-        <div className="space-y-4">
-          <div>
-            <Button
-              onClick={() => setShowColorPicker(showColorPicker === 'background' ? null : 'background')}
-              className="w-full mb-2"
-            >
-              Change Background Color
-            </Button>
-            {showColorPicker === 'background' && (
-              <div className="absolute z-10">
-                <ChromePicker
-                  color={profile.background_color}
-                  onChange={(color) => updateProfile.mutate({ background_color: color.hex })}
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <Button
-              onClick={() => setShowColorPicker(showColorPicker === 'text' ? null : 'text')}
-              className="w-full mb-2"
-            >
-              Change Text Color
-            </Button>
-            {showColorPicker === 'text' && (
-              <div className="absolute z-10">
-                <ChromePicker
-                  color={profile.text_color}
-                  onChange={(color) => updateProfile.mutate({ text_color: color.hex })}
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <Button
-              onClick={() => setShowColorPicker(showColorPicker === 'button' ? null : 'button')}
-              className="w-full mb-2"
-            >
-              Change Button Color
-            </Button>
-            {showColorPicker === 'button' && (
-              <div className="absolute z-10">
-                <ChromePicker
-                  color={profile.button_color}
-                  onChange={(color) => updateProfile.mutate({ button_color: color.hex })}
-                />
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

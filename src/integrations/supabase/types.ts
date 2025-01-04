@@ -44,6 +44,7 @@ export type Database = {
           background_color: string | null
           bio: string | null
           button_color: string | null
+          button_text_color: string | null
           code_id: string
           company: string | null
           created_at: string
@@ -63,6 +64,7 @@ export type Database = {
           background_color?: string | null
           bio?: string | null
           button_color?: string | null
+          button_text_color?: string | null
           code_id: string
           company?: string | null
           created_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           background_color?: string | null
           bio?: string | null
           button_color?: string | null
+          button_text_color?: string | null
           code_id?: string
           company?: string | null
           created_at?: string
