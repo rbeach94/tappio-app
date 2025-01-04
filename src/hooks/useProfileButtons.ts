@@ -26,12 +26,18 @@ export const useProfileButtons = (profileId: string) => {
   });
 
   const addButton = useMutation({
-    mutationFn: async (buttonData: Partial<Tables<"profile_buttons">>) => {
+    mutationFn: async (buttonData: {
+      label: string;
+      action_type: string;
+      action_value: string;
+    }) => {
       const { error } = await supabase
         .from('profile_buttons')
         .insert({
           profile_id: profileId,
-          ...buttonData,
+          label: buttonData.label,
+          action_type: buttonData.action_type,
+          action_value: buttonData.action_value,
           sort_order: buttons?.length || 0,
         });
       if (error) throw error;

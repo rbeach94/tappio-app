@@ -40,26 +40,24 @@ const Profile = () => {
   };
 
   const handleFormSubmit = async (formData: FormData) => {
-    const buttonData = {
-      label: formData.get('label'),
-      action_type: formData.get('action_type'),
-      action_value: formData.get('action_value'),
-    };
-    addButton.mutate(buttonData);
+    const label = formData.get('label')?.toString() || '';
+    const action_type = formData.get('action_type')?.toString() || '';
+    const action_value = formData.get('action_value')?.toString() || '';
+
+    if (!label || !action_type || !action_value) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    addButton.mutate({
+      label,
+      action_type,
+      action_value,
+    });
   };
 
   const handleReorder = (reorderedButtons: Tables<"profile_buttons">[]) => {
-    reorderButtons.mutate(
-      reorderedButtons.map((button, index) => ({
-        id: button.id,
-        profile_id: button.profile_id,
-        label: button.label,
-        action_type: button.action_type,
-        action_value: button.action_value,
-        sort_order: index,
-        created_at: button.created_at
-      }))
-    );
+    reorderButtons.mutate(reorderedButtons);
   };
 
   if (isLoading) {
