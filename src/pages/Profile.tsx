@@ -9,6 +9,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileButtons } from "@/components/profile/ProfileButtons";
 import { ButtonForm } from "@/components/profile/ButtonForm";
+import { Navigation } from "@/components/navigation/Navigation";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
@@ -154,17 +155,18 @@ END:VCARD`;
 
   return (
     <>
+      <Navigation />
       <ProfileHeader isLoading={isLoading} error={error as Error} />
       
       {profile && (
         <div 
-          className="min-h-screen p-4"
+          className="min-h-screen py-12"
           style={{
             backgroundColor: profile.background_color || '#15202B',
             color: profile.text_color || '#FFFFFF',
           }}
         >
-          <div className="max-w-md mx-auto space-y-6">
+          <div className="max-w-md mx-auto space-y-6 px-4">
             <LogoUpload 
               profileId={profile.id}
               logoUrl={profile.logo_url}
