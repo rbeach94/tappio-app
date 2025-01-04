@@ -4,22 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate auth for now - we'll integrate Supabase later
-    setTimeout(() => {
+
+    try {
+      if (mode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast.success("Successfully logged in!");
+        navigate("/dashboard");
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast.success("Successfully signed up! Please check your email for verification.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
+    } finally {
       setIsLoading(false);
-      localStorage.setItem("isAuthenticated", "true");
-      toast.success(`Successfully ${mode === "login" ? "logged in" : "signed up"}!`);
-      navigate("/dashboard");
-    }, 1000);
+    }
   };
 
   return (
@@ -41,6 +63,8 @@ export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
               type="email"
               placeholder="Email"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full"
             />
           </div>
@@ -49,6 +73,8 @@ export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
               type="password"
               placeholder="Password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full"
             />
           </div>
