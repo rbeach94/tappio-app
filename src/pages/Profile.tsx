@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Navigation } from "@/components/navigation/Navigation";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
