@@ -1,21 +1,20 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Added this import
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LogoUpload } from "@/components/profile/LogoUpload";
 import { ProfileForm } from "@/components/profile/ProfileForm";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { ProfileButtons } from "@/components/profile/ProfileButtons";
+import { ButtonForm } from "@/components/profile/ButtonForm";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
-
-  console.log('Profile component mounted with id:', id);
 
   const { data: profile, isLoading, error } = useQuery({
     queryKey: ['profile', id],
@@ -129,151 +128,83 @@ END:VCARD`;
     document.body.removeChild(link);
   };
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Profile</h1>
-        <p className="text-gray-600 mb-4">There was an error loading your profile. Please try again later.</p>
-        <Button 
-          onClick={() => window.location.href = '/dashboard'}
-          variant="outline"
-        >
-          Return to Dashboard
-        </Button>
-      </div>
-    );
-  }
+  const handleButtonClick = (button: any) => {
+    switch (button.action_type) {
+      case 'link':
+        window.open(button.action_value, '_blank');
+        break;
+      case 'email':
+        window.location.href = `mailto:${button.action_value}`;
+        break;
+      case 'call':
+        window.location.href = `tel:${button.action_value}`;
+        break;
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
-        <p className="text-gray-600 mb-4">The profile you're looking for doesn't exist or you don't have permission to view it.</p>
-        <Button 
-          onClick={() => window.location.href = '/dashboard'}
-          variant="outline"
-        >
-          Return to Dashboard
-        </Button>
-      </div>
-    );
-  }
+  const handleAddButton = (formData: FormData) => {
+    addButton.mutate({
+      label: formData.get('label') as string,
+      action_type: formData.get('action_type') as 'link' | 'email' | 'call',
+      action_value: formData.get('action_value') as string,
+    });
+  };
 
   return (
-    <div 
-      className="min-h-screen p-4"
-      style={{
-        backgroundColor: profile.background_color || '#15202B',
-        color: profile.text_color || '#FFFFFF',
-      }}
-    >
-      <div className="max-w-md mx-auto space-y-6">
-        <LogoUpload 
-          profileId={profile.id}
-          logoUrl={profile.logo_url}
-          onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
-        />
-
-        <Button 
-          onClick={generateVCard}
-          className="w-full"
-          style={{ 
-            backgroundColor: profile.button_color || '#8899ac',
-            color: profile.button_text_color || '#FFFFFF'
+    <>
+      <ProfileHeader isLoading={isLoading} error={error as Error} />
+      
+      {profile && (
+        <div 
+          className="min-h-screen p-4"
+          style={{
+            backgroundColor: profile.background_color || '#15202B',
+            color: profile.text_color || '#FFFFFF',
           }}
         >
-          Save My Contact
-        </Button>
+          <div className="max-w-md mx-auto space-y-6">
+            <LogoUpload 
+              profileId={profile.id}
+              logoUrl={profile.logo_url}
+              onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
+            />
 
-        <ProfileForm
-          profile={profile}
-          onUpdate={updateProfile.mutate}
-          onSave={generateVCard}
-          showColorPicker={showColorPicker}
-          setShowColorPicker={setShowColorPicker}
-        />
+            <Button 
+              onClick={generateVCard}
+              className="w-full"
+              style={{ 
+                backgroundColor: profile.button_color || '#8899ac',
+                color: profile.button_text_color || '#FFFFFF'
+              }}
+            >
+              Save My Contact
+            </Button>
 
-        {/* Custom Buttons */}
-        <div className="space-y-4">
-          {profile.profile_buttons?.map((button) => (
-            <div key={button.id} className="flex gap-2">
-              <Button
-                className="flex-1"
-                style={{ 
-                  backgroundColor: profile.button_color || '#8899ac',
-                  color: profile.button_text_color || '#FFFFFF'
-                }}
-                onClick={() => {
-                  switch (button.action_type) {
-                    case 'link':
-                      window.open(button.action_value, '_blank');
-                      break;
-                    case 'email':
-                      window.location.href = `mailto:${button.action_value}`;
-                      break;
-                    case 'call':
-                      window.location.href = `tel:${button.action_value}`;
-                      break;
-                  }
-                }}
-              >
-                {button.label}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => deleteButton.mutate(button.id)}
-              >
-                Delete
-              </Button>
-            </div>
-          ))}
+            <ProfileForm
+              profile={profile}
+              onUpdate={updateProfile.mutate}
+              onSave={generateVCard}
+              showColorPicker={showColorPicker}
+              setShowColorPicker={setShowColorPicker}
+            />
+
+            <ProfileButtons
+              buttons={profile.profile_buttons}
+              buttonColor={profile.button_color || '#8899ac'}
+              buttonTextColor={profile.button_text_color || '#FFFFFF'}
+              onDelete={(buttonId) => deleteButton.mutate(buttonId)}
+              onButtonClick={handleButtonClick}
+            />
+
+            <ButtonForm
+              buttonColor={profile.button_color || '#8899ac'}
+              buttonTextColor={profile.button_text_color || '#FFFFFF'}
+              onSubmit={handleAddButton}
+            />
+          </div>
         </div>
-
-        {/* Add Button Form */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            addButton.mutate({
-              label: formData.get('label') as string,
-              action_type: formData.get('action_type') as 'link' | 'email' | 'call',
-              action_value: formData.get('action_value') as string,
-            });
-            (e.target as HTMLFormElement).reset();
-          }}
-          className="space-y-4"
-        >
-          <Input name="label" placeholder="Button Label" required className="text-black" />
-          <select name="action_type" required className="w-full p-2 rounded border text-black">
-            <option value="link">Link</option>
-            <option value="email">Email</option>
-            <option value="call">Call</option>
-          </select>
-          <Input name="action_value" placeholder="URL/Email/Phone" required className="text-black" />
-          <Button 
-            type="submit" 
-            className="w-full"
-            style={{ 
-              backgroundColor: profile.button_color || '#8899ac',
-              color: profile.button_text_color || '#FFFFFF'
-            }}
-          >
-            Add Button
-          </Button>
-        </form>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
