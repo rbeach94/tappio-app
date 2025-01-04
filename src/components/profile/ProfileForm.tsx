@@ -34,12 +34,12 @@ export const ProfileForm = ({
     onSave();
   };
 
-  const SocialField = ({ icon: Icon, label, value, onChange }) => (
+  const SocialField = ({ icon: Icon, label, field }: { icon: any, label: string, field: keyof Tables<"nfc_profiles"> }) => (
     <div className="flex items-center space-x-2">
       <Icon className="h-5 w-5 text-gray-500" />
       <Input
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
+        value={localProfile[field] || ''}
+        onChange={(e) => handleChange({ [field]: e.target.value })}
         placeholder={`${label} URL`}
         className="flex-1 text-black"
       />
@@ -135,32 +135,27 @@ export const ProfileForm = ({
         <SocialField
           icon={Facebook}
           label="Facebook"
-          value={localProfile.facebook_url}
-          onChange={(value) => handleChange({ facebook_url: value })}
+          field="facebook_url"
         />
         <SocialField
           icon={Instagram}
           label="Instagram"
-          value={localProfile.instagram_url}
-          onChange={(value) => handleChange({ instagram_url: value })}
+          field="instagram_url"
         />
         <SocialField
           icon={Twitter}
           label="X (Twitter)"
-          value={localProfile.twitter_url}
-          onChange={(value) => handleChange({ twitter_url: value })}
+          field="twitter_url"
         />
         <SocialField
           icon={Youtube}
           label="YouTube"
-          value={localProfile.youtube_url}
-          onChange={(value) => handleChange({ youtube_url: value })}
+          field="youtube_url"
         />
         <SocialField
           icon={Linkedin}
           label="LinkedIn"
-          value={localProfile.linkedin_url}
-          onChange={(value) => handleChange({ linkedin_url: value })}
+          field="linkedin_url"
         />
       </div>
 
