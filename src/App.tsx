@@ -38,14 +38,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/profile/:id/view"
-            element={
-              <ProtectedRoute>
-                <ViewProfile />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/profile/:id/view" element={<ViewProfile />} />
           <Route
             path="/admin"
             element={
