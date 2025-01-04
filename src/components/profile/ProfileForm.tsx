@@ -29,7 +29,9 @@ export const ProfileForm = ({
   };
 
   const handleSave = () => {
+    console.log('Saving profile changes:', localProfile);
     onUpdate(localProfile);
+    onSave();
   };
 
   const SocialField = ({ icon: Icon, label, value, onChange }) => (
