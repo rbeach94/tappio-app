@@ -29,7 +29,9 @@ const Profile = () => {
             label,
             action_type,
             action_value,
-            sort_order
+            sort_order,
+            created_at,
+            profile_id
           )
         `)
         .eq('id', id)
@@ -174,7 +176,7 @@ END:VCARD`;
               className="w-full"
               style={{ 
                 backgroundColor: profile.button_color || '#8899ac',
-                color: profile.button_text_color || '#FFFFFF'
+                color: profile.button_text_color || '#000000'
               }}
             >
               Save My Contact
@@ -191,14 +193,14 @@ END:VCARD`;
             <ProfileButtons
               buttons={profile.profile_buttons}
               buttonColor={profile.button_color || '#8899ac'}
-              buttonTextColor={profile.button_text_color || '#FFFFFF'}
+              buttonTextColor={profile.button_text_color || '#000000'}
               onDelete={(buttonId) => deleteButton.mutate(buttonId)}
               onButtonClick={handleButtonClick}
             />
 
             <ButtonForm
               buttonColor={profile.button_color || '#8899ac'}
-              buttonTextColor={profile.button_text_color || '#FFFFFF'}
+              buttonTextColor={profile.button_text_color || '#000000'}
               onSubmit={handleAddButton}
             />
           </div>
