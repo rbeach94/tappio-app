@@ -10,18 +10,32 @@ export const useProfileData = (id: string) => {
     queryKey: ['profile', id],
     queryFn: async () => {
       console.log('Fetching profile data for id:', id);
-      const { data, error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('nfc_profiles')
         .select('*')
         .eq('id', id)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
       }
-      
-      return data;
+
+      const { data: buttonsData, error: buttonsError } = await supabase
+        .from('profile_buttons')
+        .select('*')
+        .eq('profile_id', id)
+        .order('sort_order', { ascending: true });
+
+      if (buttonsError) {
+        console.error('Error fetching buttons:', buttonsError);
+        throw buttonsError;
+      }
+
+      return {
+        ...profileData,
+        profile_buttons: buttonsData
+      };
     },
     enabled: !!id,
   });
@@ -47,9 +61,10 @@ export const useProfileData = (id: string) => {
 
   const updateProfile = useMutation({
     mutationFn: async (updates: any) => {
+      const { profile_buttons, ...profileUpdates } = updates;
       const { error } = await supabase
         .from('nfc_profiles')
-        .update(updates)
+        .update(profileUpdates)
         .eq('id', id);
       if (error) throw error;
     },
