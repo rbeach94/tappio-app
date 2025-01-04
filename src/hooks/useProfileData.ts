@@ -1,132 +1,22 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Tables } from "@/integrations/supabase/types";
+import { useProfile } from "./useProfile";
+import { useProfileButtons } from "./useProfileButtons";
 
 export const useProfileData = (id: string) => {
-  const queryClient = useQueryClient();
+  const { 
+    profile, 
+    isLoading: profileLoading, 
+    error: profileError,
+    updateProfile 
+  } = useProfile(id);
 
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ['profile', id],
-    queryFn: async () => {
-      console.log('Fetching profile data for id:', id);
-      const { data, error } = await supabase
-        .from('nfc_profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
-      
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  const { data: buttons, isLoading: buttonsLoading, error: buttonsError } = useQuery({
-    queryKey: ['profile_buttons', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profile_buttons')
-        .select('*')
-        .eq('profile_id', id)
-        .order('sort_order', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching buttons:', error);
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  const updateProfile = useMutation({
-    mutationFn: async (updates: any) => {
-      const { error } = await supabase
-        .from('nfc_profiles')
-        .update(updates)
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', id] });
-      toast.success("Profile updated successfully!");
-    },
-    onError: (error) => {
-      console.error('Error updating profile:', error);
-      toast.error("Failed to update profile");
-    },
-  });
-
-  const addButton = useMutation({
-    mutationFn: async (buttonData: any) => {
-      const { error } = await supabase
-        .from('profile_buttons')
-        .insert({
-          profile_id: id,
-          ...buttonData,
-          sort_order: buttons?.length || 0,
-        });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast.success("Button added successfully!");
-    },
-    onError: (error) => {
-      console.error('Error adding button:', error);
-      toast.error("Failed to add button");
-    },
-  });
-
-  const deleteButton = useMutation({
-    mutationFn: async (buttonId: string) => {
-      const { error } = await supabase
-        .from('profile_buttons')
-        .delete()
-        .eq('id', buttonId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast.success("Button deleted successfully!");
-    },
-    onError: (error) => {
-      console.error('Error deleting button:', error);
-      toast.error("Failed to delete button");
-    },
-  });
-
-  const reorderButtons = useMutation({
-    mutationFn: async (updates: Tables<"profile_buttons">[]) => {
-      const { error } = await supabase
-        .from('profile_buttons')
-        .upsert(
-          updates.map((button, index) => ({
-            id: button.id,
-            sort_order: index,
-            profile_id: button.profile_id,
-            label: button.label,
-            action_type: button.action_type,
-            action_value: button.action_value
-          }))
-        );
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast.success("Buttons reordered successfully!");
-    },
-    onError: (error) => {
-      console.error('Error reordering buttons:', error);
-      toast.error("Failed to reorder buttons");
-    },
-  });
+  const {
+    buttons,
+    isLoading: buttonsLoading,
+    error: buttonsError,
+    addButton,
+    deleteButton,
+    reorderButtons
+  } = useProfileButtons(id);
 
   return {
     profile,
