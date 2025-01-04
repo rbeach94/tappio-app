@@ -25,7 +25,7 @@ const Profile = () => {
     reorderButtons,
   } = useProfileData(id);
 
-  const handleButtonClick = (button: any) => {
+  const handleButtonClick = (button: Tables<"profile_buttons">) => {
     switch (button.action_type) {
       case 'link':
         window.open(button.action_value, '_blank');
@@ -52,7 +52,12 @@ const Profile = () => {
     reorderButtons.mutate(
       reorderedButtons.map((button, index) => ({
         id: button.id,
+        profile_id: button.profile_id,
+        label: button.label,
+        action_type: button.action_type,
+        action_value: button.action_value,
         sort_order: index,
+        created_at: button.created_at
       }))
     );
   };
