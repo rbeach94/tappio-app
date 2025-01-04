@@ -1,46 +1,17 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileHeader } from "@/components/profile/view/ProfileHeader";
 import { SaveContactButton } from "@/components/profile/view/SaveContactButton";
 import { ProfileButtons } from "@/components/profile/view/ProfileButtons";
 import { ProfileBio } from "@/components/profile/view/ProfileBio";
+import { useProfileData } from "@/hooks/useProfileData";
 
 const ViewProfile = () => {
   const { id } = useParams<{ id: string }>();
   console.log('ViewProfile component mounted with id:', id);
 
-  const { data: profile, isLoading, error } = useQuery({
-    queryKey: ['profile', id],
-    queryFn: async () => {
-      console.log('Fetching profile data for id:', id);
-      const { data, error } = await supabase
-        .from('nfc_profiles')
-        .select(`
-          *,
-          profile_buttons (
-            id,
-            label,
-            action_type,
-            action_value,
-            sort_order
-          )
-        `)
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
-      
-      console.log('Profile data received:', data);
-      return data;
-    },
-    enabled: !!id,
-  });
+  const { profile, buttons, isLoading, error } = useProfileData(id!);
 
   if (error) {
     return (
@@ -94,7 +65,7 @@ const ViewProfile = () => {
       <div className="max-w-md mx-auto space-y-6">
         <ProfileHeader profile={profile} />
         <SaveContactButton profile={profile} />
-        <ProfileButtons profile={profile} buttons={profile.profile_buttons} />
+        <ProfileButtons profile={profile} buttons={buttons} />
         <ProfileBio bio={profile.bio} />
       </div>
     </div>
