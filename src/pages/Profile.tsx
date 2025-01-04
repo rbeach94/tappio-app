@@ -17,24 +17,14 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
 
-  const { data: profile, isLoading, error } = useQuery({
+  // First query to fetch the profile
+  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ['profile', id],
     queryFn: async () => {
       console.log('Fetching profile data for id:', id);
       const { data, error } = await supabase
         .from('nfc_profiles')
-        .select(`
-          *,
-          profile_buttons (
-            id,
-            label,
-            action_type,
-            action_value,
-            sort_order,
-            created_at,
-            profile_id
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .single();
 
@@ -43,11 +33,33 @@ const Profile = () => {
         throw error;
       }
       
-      console.log('Profile data received:', data);
       return data;
     },
     enabled: !!id,
   });
+
+  // Second query to fetch the buttons
+  const { data: buttons, isLoading: buttonsLoading, error: buttonsError } = useQuery({
+    queryKey: ['profile_buttons', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profile_buttons')
+        .select('*')
+        .eq('profile_id', id)
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching buttons:', error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  const isLoading = profileLoading || buttonsLoading;
+  const error = profileError || buttonsError;
 
   const updateProfile = useMutation({
     mutationFn: async (updates: any) => {
@@ -77,12 +89,12 @@ const Profile = () => {
         .insert({
           profile_id: id,
           ...buttonData,
-          sort_order: profile?.profile_buttons?.length || 0,
+          sort_order: buttons?.length || 0,
         });
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', id] });
+      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
       toast({
         title: "Button added",
         description: "New button has been added successfully.",
@@ -99,7 +111,7 @@ const Profile = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', id] });
+      queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
       toast({
         title: "Button deleted",
         description: "The button has been removed successfully.",
@@ -193,7 +205,7 @@ END:VCARD`;
             />
 
             <ProfileButtons
-              buttons={profile.profile_buttons}
+              buttons={buttons || []}
               buttonColor={profile.button_color || '#8899ac'}
               buttonTextColor={profile.button_text_color || '#000000'}
               onDelete={(buttonId) => deleteButton.mutate(buttonId)}
