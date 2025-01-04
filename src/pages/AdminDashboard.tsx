@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Database, Users } from "lucide-react";
+import { toast } from "sonner";
 import { Database } from "@/integrations/supabase/types";
 
 type UserWithRole = {
@@ -12,8 +14,18 @@ type UserWithRole = {
   role: Database["public"]["Enums"]["app_role"] | null;
 };
 
+type NFCCode = {
+  id: string;
+  code: string;
+  created_at: string;
+  assigned_to: string | null;
+  assigned_at: string | null;
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch user role
   const { data: userRole, isLoading: roleLoading } = useQuery({
@@ -45,12 +57,10 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
-      // Fetch roles separately
       const { data: roles } = await supabase
         .from("user_roles")
         .select("user_id, role");
 
-      // Combine profiles with roles
       return (profiles || []).map(profile => {
         const userRole = roles?.find(r => r.user_id === profile.id);
         return {
@@ -63,13 +73,61 @@ const AdminDashboard = () => {
     enabled: userRole === "admin",
   });
 
+  // Fetch NFC codes
+  const { data: nfcCodes, isLoading: codesLoading } = useQuery({
+    queryKey: ["nfcCodes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nfc_codes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as NFCCode[];
+    },
+    enabled: userRole === "admin",
+  });
+
+  // Generate codes mutation
+  const generateCodesMutation = useMutation({
+    mutationFn: async (count: number) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .rpc('generate_nfc_codes', { 
+          count: count,
+          admin_id: user.id
+        });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["nfcCodes"] });
+      toast.success("NFC codes generated successfully");
+    },
+    onError: (error) => {
+      console.error("Error generating codes:", error);
+      toast.error("Failed to generate NFC codes");
+    },
+    onSettled: () => {
+      setIsGenerating(false);
+    },
+  });
+
+  const handleGenerateCodes = async (count: number) => {
+    setIsGenerating(true);
+    generateCodesMutation.mutate(count);
+  };
+
   useEffect(() => {
     if (!roleLoading && userRole !== "admin") {
       navigate("/dashboard");
     }
   }, [roleLoading, userRole, navigate]);
 
-  if (roleLoading || usersLoading) {
+  if (roleLoading || usersLoading || codesLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -82,10 +140,77 @@ const AdminDashboard = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>User Management</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="w-5 h-5" />
+                NFC Code Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-4">
+                  <Button
+                    onClick={() => handleGenerateCodes(10)}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-2" />
+                    )}
+                    Generate 10 Codes
+                  </Button>
+                  <Button
+                    onClick={() => handleGenerateCodes(25)}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-2" />
+                    )}
+                    Generate 25 Codes
+                  </Button>
+                  <Button
+                    onClick={() => handleGenerateCodes(100)}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-2" />
+                    )}
+                    Generate 100 Codes
+                  </Button>
+                </div>
+                <div className="mt-4">
+                  <h3 className="mb-2 text-sm font-medium">Recent Codes</h3>
+                  <div className="space-y-2">
+                    {nfcCodes?.slice(0, 5).map((code) => (
+                      <div
+                        key={code.id}
+                        className="flex items-center justify-between p-3 text-sm border rounded-lg"
+                      >
+                        <span className="font-mono font-medium">{code.code}</span>
+                        <span className="text-muted-foreground">
+                          {code.assigned_to ? "Assigned" : "Available"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                User Management
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
