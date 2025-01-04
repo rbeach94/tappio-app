@@ -44,6 +44,7 @@ const Profile = () => {
       label: formData.get('label') as string,
       action_type: formData.get('action_type') as string,
       action_value: formData.get('action_value') as string,
+      profile_id: profile?.id
     };
     addButton.mutate(buttonData);
   };
