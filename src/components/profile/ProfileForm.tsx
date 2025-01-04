@@ -52,12 +52,12 @@ export const ProfileForm = ({
     if (!formRef.current) return;
 
     const formData = new FormData(formRef.current);
-    const updates = {
-      facebook_url: formData.get('facebook_url'),
-      instagram_url: formData.get('instagram_url'),
-      twitter_url: formData.get('twitter_url'),
-      youtube_url: formData.get('youtube_url'),
-      linkedin_url: formData.get('linkedin_url'),
+    const updates: Partial<Tables<"nfc_profiles">> = {
+      facebook_url: formData.get('facebook_url')?.toString() || null,
+      instagram_url: formData.get('instagram_url')?.toString() || null,
+      twitter_url: formData.get('twitter_url')?.toString() || null,
+      youtube_url: formData.get('youtube_url')?.toString() || null,
+      linkedin_url: formData.get('linkedin_url')?.toString() || null,
     };
 
     handleChange(updates);
