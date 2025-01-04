@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { Tables } from "@/integrations/supabase/types";
 
 interface ProfileHeaderProps {
   isLoading: boolean;
   error: Error | null;
+  profile?: Tables<"nfc_profiles">; // Added profile prop as optional
 }
 
-export const ProfileHeader = ({ isLoading, error }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ isLoading, error, profile }: ProfileHeaderProps) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">

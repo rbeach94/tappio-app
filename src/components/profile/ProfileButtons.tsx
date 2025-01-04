@@ -7,6 +7,7 @@ interface ProfileButtonsProps {
   buttonTextColor: string;
   onDelete: (buttonId: string) => void;
   onButtonClick: (button: Tables<"profile_buttons">) => void;
+  onAdd?: (buttonData: any) => void; // Added onAdd as optional prop
 }
 
 export const ProfileButtons = ({ 
@@ -14,7 +15,8 @@ export const ProfileButtons = ({
   buttonColor, 
   buttonTextColor, 
   onDelete, 
-  onButtonClick 
+  onButtonClick,
+  onAdd 
 }: ProfileButtonsProps) => {
   return (
     <div className="space-y-4">

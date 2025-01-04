@@ -75,10 +75,7 @@ export const useProfileData = (id: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast({
-        title: "Button added",
-        description: "New button has been added successfully.",
-      });
+      toast.success("Button added successfully!");
     },
     onError: (error) => {
       console.error('Error adding button:', error);
@@ -96,10 +93,7 @@ export const useProfileData = (id: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile_buttons', id] });
-      toast({
-        title: "Button deleted",
-        description: "The button has been removed successfully.",
-      });
+      toast.success("Button deleted successfully!");
     },
     onError: (error) => {
       console.error('Error deleting button:', error);

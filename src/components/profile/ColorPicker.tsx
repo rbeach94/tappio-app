@@ -8,9 +8,10 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   isOpen: boolean;
   onToggle: () => void;
+  onClose?: () => void; // Added onClose as optional prop
 }
 
-export const ColorPicker = ({ label, color, onChange, isOpen, onToggle }: ColorPickerProps) => {
+export const ColorPicker = ({ label, color, onChange, isOpen, onToggle, onClose }: ColorPickerProps) => {
   return (
     <div className="w-1/2 px-1">
       <Button
@@ -18,7 +19,7 @@ export const ColorPicker = ({ label, color, onChange, isOpen, onToggle }: ColorP
         className="w-full mb-2"
         style={{
           backgroundColor: color,
-          color: '#000000' // Setting text color to black for better contrast
+          color: '#000000'
         }}
       >
         {label}
@@ -29,7 +30,10 @@ export const ColorPicker = ({ label, color, onChange, isOpen, onToggle }: ColorP
             <Button
               variant="ghost"
               size="icon"
-              onClick={onToggle}
+              onClick={() => {
+                onToggle();
+                onClose?.(); // Optional chaining since onClose is optional
+              }}
               className="h-6 w-6"
             >
               <X className="h-4 w-4" />
