@@ -4,8 +4,11 @@ import { ButtonForm } from "@/components/profile/ButtonForm";
 import { ProfileButtons } from "@/components/profile/ProfileButtons";
 import { toast } from "sonner";
 import { NewProfileButton } from "@/hooks/useProfileButtons";
+import { useParams } from "react-router-dom";
 
 const Profile = () => {
+  const { id } = useParams();
+  
   const {
     profile,
     buttons,
@@ -13,7 +16,7 @@ const Profile = () => {
     deleteButton,
     isLoading,
     isDeleting,
-  } = useProfileData("your-profile-id"); // Make sure to pass the correct profile ID
+  } = useProfileData(id as string); // Use the ID from URL params
 
   const handleAddButton = (buttonData: Omit<NewProfileButton, 'profile_id'>) => {
     if (!profile?.id) {
