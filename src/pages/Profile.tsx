@@ -5,6 +5,8 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileButtons } from "@/components/profile/ProfileButtons";
 import { ColorPickerSection } from "@/components/profile/ColorPickerSection";
+import { ButtonForm } from "@/components/profile/ButtonForm";
+import { LogoUpload } from "@/components/profile/LogoUpload";
 import { useProfileData } from "@/hooks/useProfileData";
 
 const Profile = () => {
@@ -51,6 +53,15 @@ const Profile = () => {
     );
   }
 
+  const handleFormSubmit = async (formData: FormData) => {
+    const buttonData = {
+      label: formData.get('label'),
+      action_type: formData.get('action_type'),
+      action_value: formData.get('action_value'),
+    };
+    addButton.mutate(buttonData);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -60,6 +71,12 @@ const Profile = () => {
             profile={profile} 
             isLoading={isLoading}
             error={error}
+          />
+
+          <LogoUpload
+            profileId={profile.id}
+            logoUrl={profile.logo_url}
+            onLogoUpdate={(url) => updateProfile.mutate({ logo_url: url })}
           />
           
           <div className="grid gap-8">
@@ -76,14 +93,21 @@ const Profile = () => {
               setShowColorPicker={() => {}}
             />
 
-            <ProfileButtons
-              buttons={buttons || []}
-              buttonColor={profile.button_color || '#8899ac'}
-              buttonTextColor={profile.button_text_color || '#000000'}
-              onDelete={(buttonId) => deleteButton.mutate(buttonId)}
-              onAdd={(buttonData) => addButton.mutate(buttonData)}
-              onButtonClick={handleButtonClick}
-            />
+            <div className="space-y-6">
+              <ButtonForm
+                buttonColor={profile.button_color || '#8899ac'}
+                buttonTextColor={profile.button_text_color || '#000000'}
+                onSubmit={handleFormSubmit}
+              />
+
+              <ProfileButtons
+                buttons={buttons || []}
+                buttonColor={profile.button_color || '#8899ac'}
+                buttonTextColor={profile.button_text_color || '#000000'}
+                onDelete={(buttonId) => deleteButton.mutate(buttonId)}
+                onButtonClick={handleButtonClick}
+              />
+            </div>
           </div>
         </div>
       </div>
