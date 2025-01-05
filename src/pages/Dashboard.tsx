@@ -31,6 +31,10 @@ const Dashboard = () => {
   const { data: profiles, isLoading: profilesLoading, refetch: refetchProfiles } = useQuery({
     queryKey: ["nfcProfiles"],
     queryFn: async () => {
+      console.log('Fetching user profiles');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data: profiles, error } = await supabase
         .from("nfc_profiles")
         .select(`
@@ -38,9 +42,13 @@ const Dashboard = () => {
           nfc_codes (
             code
           )
-        `);
+        `)
+        .eq('user_id', user.id); // Filter by the current user's ID
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        throw error;
+      }
       return profiles;
     },
   });
