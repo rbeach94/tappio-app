@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          status: Database["public"]["Enums"]["feedback_status"] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          status?: Database["public"]["Enums"]["feedback_status"] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          status?: Database["public"]["Enums"]["feedback_status"] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nfc_codes: {
         Row: {
           assigned_at: string | null
@@ -311,6 +341,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      feedback_status: "new" | "in_consideration" | "in_production" | "done"
     }
     CompositeTypes: {
       [_ in never]: never

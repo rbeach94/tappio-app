@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, Settings, Headset, LogOut, Menu } from "lucide-react";
+import { Home, LayoutDashboard, Settings, MessageSquare, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,14 +28,13 @@ export const Navigation = () => {
     { icon: Home, label: "Home", onClick: () => navigate("/") },
     { icon: LayoutDashboard, label: "Dashboard", onClick: () => navigate("/dashboard") },
     { icon: Settings, label: "Admin", onClick: () => navigate("/admin") },
-    { icon: Headset, label: "Support", onClick: () => navigate("/support") },
+    { icon: MessageSquare, label: "Feedback", onClick: () => navigate("/feedback") },
   ];
 
   return (
     <nav className="bg-background border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
-          {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-4 items-center">
             {navigationItems.map((item) => (
               <Button
@@ -50,7 +49,6 @@ export const Navigation = () => {
             ))}
           </div>
 
-          {/* Mobile Navigation */}
           <div className="md:hidden flex items-center">
             <Sheet>
               <SheetTrigger asChild>
@@ -87,7 +85,6 @@ export const Navigation = () => {
             </Sheet>
           </div>
 
-          {/* Dashboard Button (visible on all screens) */}
           <div className="flex items-center">
             <Button
               variant="ghost"

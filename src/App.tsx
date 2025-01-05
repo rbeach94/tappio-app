@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CodeRedirect from "./pages/CodeRedirect";
 import Activate from "./pages/Activate";
 import { ReviewPlaqueForm } from "./components/review/ReviewPlaqueForm";
+import Feedback from "./pages/Feedback";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <ProtectedRoute>
+                <Feedback />
               </ProtectedRoute>
             }
           />
