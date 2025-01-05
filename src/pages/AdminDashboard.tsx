@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, DatabaseIcon, Users } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
-import AvailableCodesTable from "@/components/admin/AvailableCodesTable";
+import NFCCodeManagement from "@/components/admin/NFCCodeManagement";
+import ReviewCodeManagement from "@/components/admin/ReviewCodeManagement";
 import RecentActivatedCodesCard from "@/components/admin/RecentActivatedCodesCard";
 
 type UserWithRole = {
@@ -28,7 +29,8 @@ export type NFCCode = {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingNFC, setIsGeneratingNFC] = useState(false);
+  const [isGeneratingReview, setIsGeneratingReview] = useState(false);
 
   // Fetch user role
   const { data: userRole, isLoading: roleLoading } = useQuery({
@@ -83,6 +85,7 @@ const AdminDashboard = () => {
       const { data, error } = await supabase
         .from("nfc_codes")
         .select("*")
+        .eq('type', 'profile')
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -91,10 +94,26 @@ const AdminDashboard = () => {
     enabled: userRole === "admin",
   });
 
-  const handleDownloadCSV = () => {
-    if (!nfcCodes) return;
+  // Fetch Review codes
+  const { data: reviewCodes, isLoading: reviewCodesLoading } = useQuery({
+    queryKey: ["reviewCodes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nfc_codes")
+        .select("*")
+        .eq('type', 'review')
+        .order("created_at", { ascending: false });
 
-    const availableCodes = nfcCodes.filter(code => !code.assigned_to);
+      if (error) throw error;
+      return data as NFCCode[];
+    },
+    enabled: userRole === "admin",
+  });
+
+  const handleDownloadCSV = (codes: NFCCode[], prefix: string) => {
+    if (!codes) return;
+
+    const availableCodes = codes.filter(code => !code.assigned_to);
     const csvContent = [
       ["Code", "URL", "Created At"],
       ...availableCodes.map(code => [
@@ -111,14 +130,14 @@ const AdminDashboard = () => {
     const a = document.createElement("a");
     a.setAttribute("hidden", "");
     a.setAttribute("href", url);
-    a.setAttribute("download", `available-codes-${new Date().toISOString().slice(0, 10)}.csv`);
+    a.setAttribute("download", `${prefix}-codes-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
-  // Generate codes mutation
-  const generateCodesMutation = useMutation({
+  // Generate NFC codes mutation
+  const generateNFCCodesMutation = useMutation({
     mutationFn: async (count: number) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
@@ -126,7 +145,8 @@ const AdminDashboard = () => {
       const { data, error } = await supabase
         .rpc('generate_nfc_codes', { 
           count: count,
-          admin_id: user.id
+          admin_id: user.id,
+          code_type: 'profile'
         });
 
       if (error) throw error;
@@ -141,13 +161,47 @@ const AdminDashboard = () => {
       toast.error("Failed to generate NFC codes");
     },
     onSettled: () => {
-      setIsGenerating(false);
+      setIsGeneratingNFC(false);
     },
   });
 
-  const handleGenerateCodes = async (count: number) => {
-    setIsGenerating(true);
-    generateCodesMutation.mutate(count);
+  // Generate Review codes mutation
+  const generateReviewCodesMutation = useMutation({
+    mutationFn: async (count: number) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .rpc('generate_nfc_codes', { 
+          count: count,
+          admin_id: user.id,
+          code_type: 'review'
+        });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviewCodes"] });
+      toast.success("Review codes generated successfully");
+    },
+    onError: (error) => {
+      console.error("Error generating codes:", error);
+      toast.error("Failed to generate review codes");
+    },
+    onSettled: () => {
+      setIsGeneratingReview(false);
+    },
+  });
+
+  const handleGenerateNFCCodes = async (count: number) => {
+    setIsGeneratingNFC(true);
+    generateNFCCodesMutation.mutate(count);
+  };
+
+  const handleGenerateReviewCodes = async (count: number) => {
+    setIsGeneratingReview(true);
+    generateReviewCodesMutation.mutate(count);
   };
 
   useEffect(() => {
@@ -156,7 +210,7 @@ const AdminDashboard = () => {
     }
   }, [roleLoading, userRole, navigate]);
 
-  if (roleLoading || usersLoading || codesLoading) {
+  if (roleLoading || usersLoading || codesLoading || reviewCodesLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -170,59 +224,19 @@ const AdminDashboard = () => {
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DatabaseIcon className="w-5 h-5" />
-                NFC Code Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    onClick={() => handleGenerateCodes(10)}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4 mr-2" />
-                    )}
-                    Generate 10 Codes
-                  </Button>
-                  <Button
-                    onClick={() => handleGenerateCodes(25)}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4 mr-2" />
-                    )}
-                    Generate 25 Codes
-                  </Button>
-                  <Button
-                    onClick={() => handleGenerateCodes(100)}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4 mr-2" />
-                    )}
-                    Generate 100 Codes
-                  </Button>
-                </div>
-                {nfcCodes && (
-                  <AvailableCodesTable 
-                    codes={nfcCodes} 
-                    onDownloadCSV={handleDownloadCSV}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <NFCCodeManagement
+            nfcCodes={nfcCodes || []}
+            isGenerating={isGeneratingNFC}
+            onGenerateCodes={handleGenerateNFCCodes}
+            onDownloadCSV={() => handleDownloadCSV(nfcCodes || [], 'nfc')}
+          />
+
+          <ReviewCodeManagement
+            reviewCodes={reviewCodes || []}
+            isGenerating={isGeneratingReview}
+            onGenerateCodes={handleGenerateReviewCodes}
+            onDownloadCSV={() => handleDownloadCSV(reviewCodes || [], 'review')}
+          />
 
           <Card>
             <CardHeader>
