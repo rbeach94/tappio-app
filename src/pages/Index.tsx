@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/AuthForm";
 import { Card, CardContent } from "@/components/ui/card";
-import { PhoneNfc, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Smartphone, ArrowRight, CheckCircle2 } from "lucide-react";
 
 const Index = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -39,7 +39,7 @@ const Index = () => {
         <div className="max-w-xl mx-auto space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <PhoneNfc size={40} className="text-[#8899ac]" />
+              <Smartphone size={40} className="text-[#8899ac]" />
               <h1 className="text-3xl md:text-4xl font-bold">
                 Digital Business Cards
               </h1>
