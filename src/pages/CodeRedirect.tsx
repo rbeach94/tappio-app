@@ -19,9 +19,10 @@ const CodeRedirect = () => {
 
       try {
         // First, get the NFC code details
+        console.log('Fetching NFC code details for:', code);
         const { data: nfcCode, error: nfcError } = await supabase
           .from('nfc_codes')
-          .select('id, assigned_to, url, is_active')
+          .select('*')  // Changed to select all columns for debugging
           .eq('code', code)
           .maybeSingle();
 
@@ -56,11 +57,12 @@ const CodeRedirect = () => {
         }
 
         // Fallback: Get the profile ID and construct the URL
+        console.log('Fetching profile for code_id:', nfcCode.id);
         const { data: profile, error: profileError } = await supabase
           .from('nfc_profiles')
-          .select('id')
+          .select('*')  // Changed to select all columns for debugging
           .eq('code_id', nfcCode.id)
-          .maybeSingle();  // Changed from .single() to .maybeSingle()
+          .maybeSingle();
 
         console.log('Profile query result:', { profile, profileError });
 
