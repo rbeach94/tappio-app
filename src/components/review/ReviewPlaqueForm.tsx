@@ -49,6 +49,11 @@ export const ReviewPlaqueForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code) return;
+
+    if (!formData.businessName.trim()) {
+      toast.error("Please enter a name for the review plaque");
+      return;
+    }
     
     setIsSubmitting(true);
 
@@ -80,7 +85,7 @@ export const ReviewPlaqueForm = () => {
         <div className="space-y-4">
           <div>
             <label htmlFor="businessName" className="block text-sm font-medium mb-1">
-              Business Name
+              Name of Review Plaque <span className="text-red-500">*</span>
             </label>
             <Input
               id="businessName"
@@ -89,7 +94,11 @@ export const ReviewPlaqueForm = () => {
                 setFormData({ ...formData, businessName: e.target.value })
               }
               required
+              placeholder="Enter the name for your review plaque"
             />
+            <p className="text-sm text-muted-foreground mt-1">
+              This name will be displayed on your dashboard and review URL
+            </p>
           </div>
 
           <div>
@@ -102,7 +111,7 @@ export const ReviewPlaqueForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
               }
-              required
+              placeholder="Enter business location (optional)"
             />
           </div>
 
@@ -116,7 +125,7 @@ export const ReviewPlaqueForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              required
+              placeholder="Enter a description for your review plaque (optional)"
             />
           </div>
 
@@ -131,7 +140,7 @@ export const ReviewPlaqueForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, websiteUrl: e.target.value })
               }
-              required
+              placeholder="Enter your website URL (optional)"
             />
           </div>
         </div>
