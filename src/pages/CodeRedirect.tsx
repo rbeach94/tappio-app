@@ -56,20 +56,28 @@ const CodeRedirect = () => {
             return;
           }
 
-          // Record the visit before redirecting
-          console.log('Recording visit for review plaque:', nfcCode.id);
-          const { error: visitError } = await supabase
-            .from('profile_visits')
-            .insert({ profile_id: nfcCode.id });
+          try {
+            // Record the visit before redirecting
+            console.log('Recording visit for review plaque:', nfcCode.id);
+            const { error: visitError } = await supabase
+              .from('profile_visits')
+              .insert({ profile_id: nfcCode.id });
 
-          if (visitError) {
-            console.error('Error recording visit:', visitError);
-            // Continue with redirect even if visit recording fails
+            if (visitError) {
+              console.error('Error recording visit:', visitError);
+              // Continue with redirect even if visit recording fails
+            } else {
+              console.log('Visit recorded successfully');
+            }
+
+            // Redirect to the plaque's redirect URL
+            console.log('Redirecting to review plaque URL:', nfcCode.redirect_url);
+            window.location.href = nfcCode.redirect_url;
+          } catch (error) {
+            console.error('Error during visit recording:', error);
+            // Still redirect even if there's an error
+            window.location.href = nfcCode.redirect_url;
           }
-
-          // Redirect to the plaque's redirect URL
-          console.log('Redirecting to review plaque URL:', nfcCode.redirect_url);
-          window.location.href = nfcCode.redirect_url;
           return;
         }
 
