@@ -13,46 +13,97 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4">
-        <Button
-          className="w-full p-6 bg-black text-white hover:bg-black/90"
-          onClick={() => setShowColorPicker('background')}
-        >
-          Background Color
-          <div 
-            className="ml-2 w-6 h-6 rounded border border-white"
-            style={{ backgroundColor: profile.background_color || '#3C8C7C' }}
-          />
-        </Button>
-        <Button
-          className="w-full p-6 bg-black text-white hover:bg-black/90"
-          onClick={() => setShowColorPicker('text')}
-        >
-          Text Color
-          <div 
-            className="ml-2 w-6 h-6 rounded border border-white"
-            style={{ backgroundColor: profile.text_color || '#FFFFFF' }}
-          />
-        </Button>
-        <Button
-          className="w-full p-6 bg-black text-white hover:bg-black/90"
-          onClick={() => setShowColorPicker('button')}
-        >
-          Button Color
-          <div 
-            className="ml-2 w-6 h-6 rounded border border-white"
-            style={{ backgroundColor: profile.button_color || '#8899ac' }}
-          />
-        </Button>
-        <Button
-          className="w-full p-6 bg-black text-white hover:bg-black/90"
-          onClick={() => setShowColorPicker('buttonText')}
-        >
-          Button Text Color
-          <div 
-            className="ml-2 w-6 h-6 rounded border border-white"
-            style={{ backgroundColor: profile.button_text_color || '#000000' }}
-          />
-        </Button>
+        <div className="relative">
+          <Button
+            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            onClick={() => setShowColorPicker('background')}
+          >
+            Background Color
+            <div 
+              className="ml-2 w-6 h-6 rounded border border-white"
+              style={{ backgroundColor: profile.background_color || '#3C8C7C' }}
+            />
+          </Button>
+          {showColorPicker === 'background' && (
+            <ColorPicker
+              label="Background Color"
+              color={profile.background_color}
+              onChange={(color) => onColorChange({ background_color: color })}
+              isOpen={true}
+              onToggle={() => setShowColorPicker(null)}
+              onClose={() => setShowColorPicker(null)}
+            />
+          )}
+        </div>
+        
+        <div className="relative">
+          <Button
+            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            onClick={() => setShowColorPicker('text')}
+          >
+            Text Color
+            <div 
+              className="ml-2 w-6 h-6 rounded border border-white"
+              style={{ backgroundColor: profile.text_color || '#FFFFFF' }}
+            />
+          </Button>
+          {showColorPicker === 'text' && (
+            <ColorPicker
+              label="Text Color"
+              color={profile.text_color}
+              onChange={(color) => onColorChange({ text_color: color })}
+              isOpen={true}
+              onToggle={() => setShowColorPicker(null)}
+              onClose={() => setShowColorPicker(null)}
+            />
+          )}
+        </div>
+
+        <div className="relative">
+          <Button
+            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            onClick={() => setShowColorPicker('button')}
+          >
+            Button Color
+            <div 
+              className="ml-2 w-6 h-6 rounded border border-white"
+              style={{ backgroundColor: profile.button_color || '#8899ac' }}
+            />
+          </Button>
+          {showColorPicker === 'button' && (
+            <ColorPicker
+              label="Button Color"
+              color={profile.button_color}
+              onChange={(color) => onColorChange({ button_color: color })}
+              isOpen={true}
+              onToggle={() => setShowColorPicker(null)}
+              onClose={() => setShowColorPicker(null)}
+            />
+          )}
+        </div>
+
+        <div className="relative">
+          <Button
+            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            onClick={() => setShowColorPicker('buttonText')}
+          >
+            Button Text Color
+            <div 
+              className="ml-2 w-6 h-6 rounded border border-white"
+              style={{ backgroundColor: profile.button_text_color || '#000000' }}
+            />
+          </Button>
+          {showColorPicker === 'buttonText' && (
+            <ColorPicker
+              label="Button Text Color"
+              color={profile.button_text_color}
+              onChange={(color) => onColorChange({ button_text_color: color })}
+              isOpen={true}
+              onToggle={() => setShowColorPicker(null)}
+              onClose={() => setShowColorPicker(null)}
+            />
+          )}
+        </div>
       </div>
 
       {/* Color Preview Section */}
@@ -77,44 +128,6 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
           Example Button
         </Button>
       </div>
-
-      {showColorPicker && (
-        <ColorPicker
-          label={
-            showColorPicker === 'background'
-              ? 'Background Color'
-              : showColorPicker === 'text'
-              ? 'Text Color'
-              : showColorPicker === 'button'
-              ? 'Button Color'
-              : 'Button Text Color'
-          }
-          color={
-            showColorPicker === 'background'
-              ? profile.background_color
-              : showColorPicker === 'text'
-              ? profile.text_color
-              : showColorPicker === 'button'
-              ? profile.button_color
-              : profile.button_text_color
-          }
-          onChange={(color) => {
-            const updates = {
-              [showColorPicker === 'background'
-                ? 'background_color'
-                : showColorPicker === 'text'
-                ? 'text_color'
-                : showColorPicker === 'button'
-                ? 'button_color'
-                : 'button_text_color']: color,
-            };
-            onColorChange(updates);
-          }}
-          isOpen={true}
-          onToggle={() => setShowColorPicker(null)}
-          onClose={() => setShowColorPicker(null)}
-        />
-      )}
     </div>
   );
 };
