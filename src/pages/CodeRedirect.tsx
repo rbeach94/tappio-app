@@ -18,31 +18,31 @@ const CodeRedirect = () => {
       }
 
       try {
-        // First, get the NFC code details
+        // First, get the NFC code details using maybeSingle() instead of single()
         const { data: nfcCode, error: nfcError } = await supabase
           .from('nfc_codes')
           .select('id, assigned_to, url')
           .eq('code', code)
-          .single();
+          .maybeSingle();
 
         console.log('NFC code data:', nfcCode, 'Error:', nfcError);
 
-        // If the code doesn't exist in the database
-        if (nfcError?.code === 'PGRST116') {
-          console.log('Code not found, redirecting to activate page');
-          navigate(`/activate/${code}`);
-          return;
-        }
-
-        // For any other database errors
+        // If there was a database error
         if (nfcError) {
           console.error('Database error:', nfcError);
           navigate('/');
           return;
         }
 
+        // If the code doesn't exist in the database
+        if (!nfcCode) {
+          console.log('Code not found, redirecting to activate page');
+          navigate(`/activate/${code}`);
+          return;
+        }
+
         // If the code exists but is not assigned
-        if (!nfcCode?.assigned_to) {
+        if (!nfcCode.assigned_to) {
           console.log('Code not assigned, redirecting to activate page');
           navigate(`/activate/${code}`);
           return;
