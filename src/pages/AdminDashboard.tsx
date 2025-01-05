@@ -8,6 +8,7 @@ import { Loader2, Plus, DatabaseIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import AvailableCodesTable from "@/components/admin/AvailableCodesTable";
+import RecentActivatedCodesCard from "@/components/admin/RecentActivatedCodesCard";
 
 type UserWithRole = {
   id: string;
@@ -248,6 +249,10 @@ const AdminDashboard = () => {
               </div>
             </CardContent>
           </Card>
+
+          {nfcCodes && (
+            <RecentActivatedCodesCard codes={nfcCodes} />
+          )}
         </div>
       </div>
     </div>
