@@ -15,9 +15,20 @@ export const FeedbackForm = () => {
     setIsSubmitting(true);
 
     try {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase
         .from("feedback")
-        .insert([{ title, description }]);
+        .insert({
+          title,
+          description,
+          user_id: user.id
+        });
 
       if (error) throw error;
 
