@@ -25,11 +25,12 @@ export const ProfileForm = ({
   const formRef = useRef<HTMLFormElement>(null);
 
   const formatUrl = (url: string | null) => {
-    if (!url) return null;
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
+    if (!url || url.trim() === '') return null;
+    const trimmedUrl = url.trim();
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl;
     }
-    return `https://${url}`;
+    return `https://${trimmedUrl}`;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
