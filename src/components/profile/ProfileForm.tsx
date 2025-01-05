@@ -24,6 +24,14 @@ export const ProfileForm = ({
 }: ProfileFormProps) => {
   const formRef = useRef<HTMLFormElement>(null);
 
+  const formatUrl = (url: string | null) => {
+    if (!url) return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formRef.current) return;
@@ -35,13 +43,13 @@ export const ProfileForm = ({
       company: formData.get('company')?.toString() || null,
       email: formData.get('email')?.toString() || null,
       phone: formData.get('phone')?.toString() || null,
-      website: formData.get('website')?.toString() || null,
+      website: formatUrl(formData.get('website')?.toString() || null),
       bio: formData.get('bio')?.toString() || null,
-      facebook_url: formData.get('facebook_url')?.toString() || null,
-      instagram_url: formData.get('instagram_url')?.toString() || null,
-      twitter_url: formData.get('twitter_url')?.toString() || null,
-      youtube_url: formData.get('youtube_url')?.toString() || null,
-      linkedin_url: formData.get('linkedin_url')?.toString() || null,
+      facebook_url: formatUrl(formData.get('facebook_url')?.toString() || null),
+      instagram_url: formatUrl(formData.get('instagram_url')?.toString() || null),
+      twitter_url: formatUrl(formData.get('twitter_url')?.toString() || null),
+      youtube_url: formatUrl(formData.get('youtube_url')?.toString() || null),
+      linkedin_url: formatUrl(formData.get('linkedin_url')?.toString() || null),
     };
 
     onUpdate(updates);
