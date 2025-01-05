@@ -1,17 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-import { ProfileCard } from "@/components/dashboard/ProfileCard";
-import { ReviewPlaqueCard } from "@/components/dashboard/ReviewPlaqueCard";
-import { AddCardDialog } from "@/components/dashboard/AddCardDialog";
+import { toast } from "sonner";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardActions } from "@/components/dashboard/DashboardActions";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const [isAddingCard, setIsAddingCard] = useState(false);
 
   // Fetch user role
@@ -120,62 +115,24 @@ const Dashboard = () => {
     },
   });
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    toast.success("Successfully logged out!");
-    navigate("/login");
-  };
-
   const isLoading = profilesLoading || plaquesLoading;
-  const hasNoItems = (!profiles || profiles.length === 0) && (!reviewPlaques || reviewPlaques.length === 0);
 
   return (
     <div className="min-h-screen p-4 md:p-8 page-transition">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <div className="flex gap-4">
-            {userRole === "admin" && (
-              <Button onClick={() => navigate("/admin")} variant="outline">
-                Admin Dashboard
-              </Button>
-            )}
-            <Button onClick={handleLogout} variant="outline">
-              Sign Out
-            </Button>
-          </div>
-        </div>
+        <DashboardHeader userRole={userRole} />
         
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Your Tappio Cards & Review Plaques</h2>
-          <AddCardDialog
-            isOpen={isAddingCard}
-            onOpenChange={setIsAddingCard}
-            assignCodeMutation={assignCodeMutation}
-            onAddCard={() => setIsAddingCard(false)}
-          />
-        </div>
+        <DashboardActions
+          isAddingCard={isAddingCard}
+          setIsAddingCard={setIsAddingCard}
+          assignCodeMutation={assignCodeMutation}
+        />
 
-        {isLoading ? (
-          <div className="flex justify-center">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        ) : hasNoItems ? (
-          <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
-              You haven't added any Tappio cards or review plaques yet. Click "Add Tappio Card" to get started.
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {profiles?.map((profile) => (
-              <ProfileCard key={profile.id} profile={profile} />
-            ))}
-            {reviewPlaques?.map((plaque) => (
-              <ReviewPlaqueCard key={plaque.id} plaque={plaque} />
-            ))}
-          </div>
-        )}
+        <DashboardContent
+          isLoading={isLoading}
+          profiles={profiles}
+          reviewPlaques={reviewPlaques}
+        />
       </div>
     </div>
   );
