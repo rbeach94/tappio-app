@@ -59,9 +59,9 @@ const CodeRedirect = () => {
           return;
         }
 
-        // Fallback: Get the profile ID and construct the URL
+        // Get or create profile
         console.log('Fetching profile for code_id:', nfcCode.id);
-        const { data: profiles, error: profileError } = await supabase
+        let { data: profiles, error: profileError } = await supabase
           .from('nfc_profiles')
           .select('*')
           .eq('code_id', nfcCode.id);
@@ -74,13 +74,34 @@ const CodeRedirect = () => {
           return;
         }
 
-        // Get the most recently created profile if multiple exist
+        // If no profile exists but code is assigned, create one
+        if ((!profiles || profiles.length === 0) && nfcCode.assigned_to) {
+          console.log('Creating profile for assigned code:', nfcCode.id);
+          const { data: newProfile, error: createError } = await supabase
+            .from('nfc_profiles')
+            .insert({
+              user_id: nfcCode.assigned_to,
+              code_id: nfcCode.id
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            navigate('/');
+            return;
+          }
+
+          profiles = [newProfile];
+        }
+
+        // Get the most recently created profile
         const profile = profiles && profiles.length > 0 
           ? profiles[0] 
           : null;
 
         if (!profile) {
-          console.log('No profile found for assigned code:', {
+          console.log('No profile found or created for assigned code:', {
             code_id: nfcCode.id,
             assigned_to: nfcCode.assigned_to
           });
