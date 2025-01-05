@@ -1,11 +1,9 @@
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tables } from "@/integrations/supabase/types";
-import { ColorPicker } from "./ColorPicker";
-import { useState, useRef } from "react";
-import { Label } from "@/components/ui/label";
-import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { useRef } from "react";
+import { BasicProfileInfo } from "./BasicProfileInfo";
+import { ContactInfo } from "./ContactInfo";
+import { SocialMediaLinks } from "./SocialMediaLinks";
 
 interface ProfileFormProps {
   profile: Tables<"nfc_profiles">;
@@ -56,18 +54,6 @@ export const ProfileForm = ({
     onSave();
   };
 
-  const SocialField = ({ icon: Icon, label, field }) => (
-    <div className="flex items-center space-x-2">
-      <Icon className="h-5 w-5 text-gray-500" />
-      <Input
-        name={field}
-        defaultValue={profile[field] || ''}
-        placeholder={`${label} URL`}
-        className="flex-1 text-black"
-      />
-    </div>
-  );
-
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
       <div className="sticky top-0 z-50 bg-background py-4 shadow-md">
@@ -79,116 +65,9 @@ export const ProfileForm = ({
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="full_name">Full Name</Label>
-          <Input
-            id="full_name"
-            name="full_name"
-            defaultValue={profile.full_name || ''}
-            placeholder="Full Name"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="job_title">Job Title</Label>
-          <Input
-            id="job_title"
-            name="job_title"
-            defaultValue={profile.job_title || ''}
-            placeholder="Job Title"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="company">Company</Label>
-          <Input
-            id="company"
-            name="company"
-            defaultValue={profile.company || ''}
-            placeholder="Company"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            defaultValue={profile.email || ''}
-            placeholder="Email"
-            type="email"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input
-            id="phone"
-            name="phone"
-            defaultValue={profile.phone || ''}
-            placeholder="Phone"
-            type="tel"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="website">Website</Label>
-          <Input
-            id="website"
-            name="website"
-            defaultValue={profile.website || ''}
-            placeholder="Website"
-            type="url"
-            className="text-black"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="bio">Bio</Label>
-          <Textarea
-            id="bio"
-            name="bio"
-            defaultValue={profile.bio || ''}
-            placeholder="Add your bio here..."
-            className="min-h-[100px] text-black"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Social Media</h3>
-        <SocialField
-          icon={Facebook}
-          label="Facebook"
-          field="facebook_url"
-        />
-        <SocialField
-          icon={Instagram}
-          label="Instagram"
-          field="instagram_url"
-        />
-        <SocialField
-          icon={Twitter}
-          label="X (Twitter)"
-          field="twitter_url"
-        />
-        <SocialField
-          icon={Youtube}
-          label="YouTube"
-          field="youtube_url"
-        />
-        <SocialField
-          icon={Linkedin}
-          label="LinkedIn"
-          field="linkedin_url"
-        />
-      </div>
+      <BasicProfileInfo defaultValues={profile} />
+      <ContactInfo defaultValues={profile} />
+      <SocialMediaLinks defaultValues={profile} />
     </form>
   );
 };
