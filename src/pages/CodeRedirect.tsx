@@ -18,24 +18,25 @@ const CodeRedirect = () => {
       }
 
       try {
-        const { data: nfcCode, error } = await supabase
+        // First, get the NFC code details
+        const { data: nfcCode, error: nfcError } = await supabase
           .from('nfc_codes')
-          .select('id, assigned_to')
+          .select('id, assigned_to, url')
           .eq('code', code)
           .single();
 
-        console.log('NFC code data:', nfcCode, 'Error:', error);
+        console.log('NFC code data:', nfcCode, 'Error:', nfcError);
 
         // If the code doesn't exist in the database
-        if (error?.code === 'PGRST116') {
+        if (nfcError?.code === 'PGRST116') {
           console.log('Code not found, redirecting to activate page');
           navigate(`/activate/${code}`);
           return;
         }
 
         // For any other database errors
-        if (error) {
-          console.error('Database error:', error);
+        if (nfcError) {
+          console.error('Database error:', nfcError);
           navigate('/');
           return;
         }
@@ -47,6 +48,14 @@ const CodeRedirect = () => {
           return;
         }
 
+        // If we have a URL, use it directly
+        if (nfcCode.url) {
+          console.log('Using pre-generated URL:', nfcCode.url);
+          window.location.href = nfcCode.url;
+          return;
+        }
+
+        // Fallback: Get the profile ID and construct the URL
         const { data: profile, error: profileError } = await supabase
           .from('nfc_profiles')
           .select('id')
@@ -60,6 +69,7 @@ const CodeRedirect = () => {
         }
 
         // Redirect to the profile view page
+        console.log('Redirecting to profile:', profile.id);
         navigate(`/profile/${profile.id}/view`);
       } catch (error) {
         console.error('Error during redirect:', error);
