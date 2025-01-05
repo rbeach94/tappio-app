@@ -24,14 +24,25 @@ const CodeRedirect = () => {
           .eq('code', code)
           .single();
 
-        if (error || !nfcCode) {
-          console.error('Error fetching NFC code:', error);
+        console.log('NFC code data:', nfcCode, 'Error:', error);
+
+        // If the code doesn't exist in the database
+        if (error?.code === 'PGRST116') {
+          console.log('Code not found, redirecting to activate page');
+          navigate(`/activate/${code}`);
+          return;
+        }
+
+        // For any other database errors
+        if (error) {
+          console.error('Database error:', error);
           navigate('/');
           return;
         }
 
-        // If the code is not assigned, redirect to activate page
-        if (!nfcCode.assigned_to) {
+        // If the code exists but is not assigned
+        if (!nfcCode?.assigned_to) {
+          console.log('Code not assigned, redirecting to activate page');
           navigate(`/activate/${code}`);
           return;
         }
