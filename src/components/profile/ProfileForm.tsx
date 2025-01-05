@@ -30,6 +30,7 @@ export const ProfileForm = ({
     if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
       return trimmedUrl;
     }
+    // Add https:// prefix if no protocol is present
     return `https://${trimmedUrl}`;
   };
 
