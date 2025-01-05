@@ -8,6 +8,7 @@ import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 const Dashboard = () => {
   const [isAddingCard, setIsAddingCard] = useState(false);
+  const [isAddingPlaque, setIsAddingPlaque] = useState(false);
 
   // Fetch user role
   const { data: userRole } = useQuery({
@@ -125,6 +126,8 @@ const Dashboard = () => {
         <DashboardActions
           isAddingCard={isAddingCard}
           setIsAddingCard={setIsAddingCard}
+          isAddingPlaque={isAddingPlaque}
+          setIsAddingPlaque={setIsAddingPlaque}
           assignCodeMutation={assignCodeMutation}
         />
 
