@@ -5,6 +5,7 @@ import { BasicProfileInfo } from "./BasicProfileInfo";
 import { ContactInfo } from "./ContactInfo";
 import { SocialMediaLinks } from "./SocialMediaLinks";
 import { ColorPickerSection } from "./ColorPickerSection";
+import { Link } from "react-router-dom";
 
 interface ProfileFormProps {
   profile: Tables<"nfc_profiles">;
@@ -58,12 +59,25 @@ export const ProfileForm = ({
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
       <div className="sticky top-0 z-50 bg-background py-4 shadow-md">
-        <Button 
-          type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white"
-        >
-          Save Changes
-        </Button>
+        <div className="flex gap-4 px-4">
+          <Button 
+            type="submit"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+          >
+            Save Changes
+          </Button>
+          <Link 
+            to={`/view/${profile.id}`}
+            className="flex-1"
+          >
+            <Button 
+              type="button"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              View Profile
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <BasicProfileInfo defaultValues={profile} />
