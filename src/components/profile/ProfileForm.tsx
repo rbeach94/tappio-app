@@ -30,7 +30,6 @@ export const ProfileForm = ({
     if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
       return trimmedUrl;
     }
-    // Add https:// prefix if no protocol is present
     return `https://${trimmedUrl}`;
   };
 
@@ -59,7 +58,7 @@ export const ProfileForm = ({
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       <div className="sticky top-0 z-50 bg-background py-4 shadow-md">
         <div className="flex gap-4 px-4">
           <Button 
@@ -82,16 +81,18 @@ export const ProfileForm = ({
         </div>
       </div>
 
-      <BasicProfileInfo defaultValues={profile} />
-      <ContactInfo defaultValues={profile} />
-      <SocialMediaLinks defaultValues={profile} />
-      
-      <div className="pt-8 border-t">
-        <h2 className="text-lg font-semibold mb-6">Appearance Settings</h2>
-        <ColorPickerSection 
-          profile={profile}
-          onColorChange={onUpdate}
-        />
+      <div className="py-12">
+        <BasicProfileInfo defaultValues={profile} />
+        <ContactInfo defaultValues={profile} />
+        <SocialMediaLinks defaultValues={profile} />
+        
+        <div className="pt-8 border-t">
+          <h2 className="text-lg font-semibold mb-6">Appearance Settings</h2>
+          <ColorPickerSection 
+            profile={profile}
+            onColorChange={onUpdate}
+          />
+        </div>
       </div>
     </form>
   );
