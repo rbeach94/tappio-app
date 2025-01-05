@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -19,37 +20,18 @@ interface Feedback {
   description: string;
   status: FeedbackStatus;
   created_at: string;
-  user_id: string;
-  profiles: {
-    email: string | null;
-  } | null;
 }
 
-interface FeedbackListProps {
-  isAdmin?: boolean;
-}
-
-export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
+export const FeedbackList = () => {
   const [updating, setUpdating] = useState<string | null>(null);
 
   const { data: feedback, isLoading } = useQuery({
-    queryKey: ["feedback", isAdmin],
+    queryKey: ["feedback"],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from("feedback")
-        .select(
-          isAdmin
-            ? "*, profiles(email)"
-            : "*"
-        );
-
-      if (!isAdmin) {
-        query = query.eq("user_id", (await supabase.auth.getUser()).data.user?.id);
-      }
-
-      const { data, error } = await query.order("created_at", {
-        ascending: false,
-      });
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as Feedback[];
@@ -82,16 +64,6 @@ export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
     );
   }
 
-  if (!feedback?.length) {
-    return (
-      <div className="text-center text-muted-foreground">
-        {isAdmin
-          ? "No feedback submissions yet"
-          : "You haven't submitted any feedback yet"}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {feedback?.map((item) => (
@@ -102,40 +74,26 @@ export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
           <h3 className="font-semibold">{item.title}</h3>
           <p className="text-sm text-muted-foreground">{item.description}</p>
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-sm text-muted-foreground">
-                {new Date(item.created_at).toLocaleDateString()}
-              </span>
-              {isAdmin && item.profiles?.email && (
-                <p className="text-sm text-muted-foreground">
-                  Submitted by: {item.profiles.email}
-                </p>
-              )}
-            </div>
-            {isAdmin && (
-              <Select
-                value={item.status}
-                onValueChange={(value: FeedbackStatus) =>
-                  updateStatus(item.id, value)
-                }
-                disabled={updating === item.id}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="in_consideration">In Consideration</SelectItem>
-                  <SelectItem value="in_production">In Production</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-            {!isAdmin && (
-              <span className="text-sm px-2 py-1 bg-muted rounded-md">
-                {item.status}
-              </span>
-            )}
+            <span className="text-sm text-muted-foreground">
+              {new Date(item.created_at).toLocaleDateString()}
+            </span>
+            <Select
+              value={item.status}
+              onValueChange={(value: FeedbackStatus) =>
+                updateStatus(item.id, value)
+              }
+              disabled={updating === item.id}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="in_consideration">In Consideration</SelectItem>
+                <SelectItem value="in_production">In Production</SelectItem>
+                <SelectItem value="done">Done</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       ))}
