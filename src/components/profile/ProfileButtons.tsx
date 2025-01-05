@@ -34,9 +34,8 @@ const SortableButton = ({ button, buttonColor, buttonTextColor, onDelete, onButt
         <GripVertical className="h-5 w-5 text-gray-500" />
       </button>
       <Button
-        className="flex-1"
+        className="flex-1 bg-black hover:bg-black/90"
         style={{ 
-          backgroundColor: buttonColor,
           color: buttonTextColor
         }}
         onClick={() => onButtonClick(button)}

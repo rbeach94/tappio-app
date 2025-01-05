@@ -70,6 +70,15 @@ export const ProfileForm = ({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 py-12">
+      <div className="sticky top-0 z-50 bg-background py-4 shadow-md">
+        <Button 
+          type="submit"
+          className="w-full bg-green-600 hover:bg-green-700 text-white"
+        >
+          Save Changes
+        </Button>
+      </div>
+
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="full_name">Full Name</Label>
@@ -180,14 +189,6 @@ export const ProfileForm = ({
           field="linkedin_url"
         />
       </div>
-
-      <Button 
-        type="submit"
-        className="w-full"
-        variant="outline"
-      >
-        Save Changes
-      </Button>
     </form>
   );
 };
