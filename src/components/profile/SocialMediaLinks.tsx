@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, X, Youtube } from "lucide-react";
 
 interface SocialMediaLinksProps {
   defaultValues: {
@@ -38,7 +38,7 @@ export const SocialMediaLinks = ({ defaultValues }: SocialMediaLinksProps) => {
         field="instagram_url"
       />
       <SocialField
-        icon={Twitter}
+        icon={X}
         label="X (Twitter)"
         field="twitter_url"
       />

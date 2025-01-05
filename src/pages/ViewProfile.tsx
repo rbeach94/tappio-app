@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Loader2, Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { Loader2, Facebook, Instagram, Linkedin, X, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileHeader } from "@/components/profile/view/ProfileHeader";
 import { SaveContactButton } from "@/components/profile/view/SaveContactButton";
@@ -87,7 +87,7 @@ const ViewProfile = () => {
           )}
           {profile.twitter_url && (
             <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer">
-              <Twitter className="w-6 h-6" />
+              <X className="w-6 h-6" />
             </a>
           )}
           {profile.youtube_url && (
