@@ -35,16 +35,16 @@ export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
   const { data: feedback, isLoading } = useQuery({
     queryKey: ["feedback", isAdmin],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from("feedback")
         .select(
           isAdmin
-            ? `*, profiles!feedback_user_id_fkey(email)`
+            ? "*, profiles!feedback_user_id_fkey(email)"
             : "*"
         );
 
       if (!isAdmin) {
-        query.eq("user_id", (await supabase.auth.getUser()).data.user?.id);
+        query = query.eq("user_id", (await supabase.auth.getUser()).data.user?.id);
       }
 
       const { data, error } = await query.order("created_at", {
