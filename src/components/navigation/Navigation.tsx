@@ -74,20 +74,28 @@ export const Navigation = () => {
                       <span>{item.label}</span>
                     </Button>
                   ))}
+                  <Button
+                    variant="ghost"
+                    className="flex items-center justify-start space-x-2 w-full"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Log out</span>
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
 
-          {/* Logout Button (visible on all screens) */}
+          {/* Dashboard Button (visible on all screens) */}
           <div className="flex items-center">
             <Button
               variant="ghost"
               className="flex items-center space-x-2"
-              onClick={handleLogout}
+              onClick={() => navigate("/dashboard")}
             >
-              <LogOut className="h-5 w-5" />
-              <span className="hidden md:inline">Log out</span>
+              <LayoutDashboard className="h-5 w-5" />
+              <span className="hidden md:inline">Dashboard</span>
             </Button>
           </div>
         </div>
