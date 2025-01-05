@@ -5,7 +5,6 @@ import { Navigation } from "@/components/navigation/Navigation";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileButtons } from "@/components/profile/ProfileButtons";
-import { ColorPickerSection } from "@/components/profile/ColorPickerSection";
 import { ButtonForm } from "@/components/profile/ButtonForm";
 import { LogoUpload } from "@/components/profile/LogoUpload";
 import { useProfileData } from "@/hooks/useProfileData";
@@ -95,11 +94,6 @@ const Profile = () => {
           />
           
           <div className="grid gap-8">
-            <ColorPickerSection
-              profile={profile}
-              onColorChange={(updates) => updateProfile.mutate(updates)}
-            />
-
             <ProfileForm
               profile={profile}
               onUpdate={updateProfile.mutate}
