@@ -43,7 +43,7 @@ export const ContactInfo = ({ defaultValues }: ContactInfoProps) => {
           name="website"
           defaultValue={defaultValues.website || ''}
           placeholder="Website"
-          type="url"
+          type="text"
           className="text-black"
         />
       </div>
