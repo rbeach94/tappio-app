@@ -67,7 +67,7 @@ export const ProfileForm = ({
             Save Changes
           </Button>
           <Link 
-            to={`/view/${profile.id}`}
+            to={`/profile/${profile.id}/view`}
             className="flex-1"
           >
             <Button 
