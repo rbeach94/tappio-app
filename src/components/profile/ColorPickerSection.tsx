@@ -11,35 +11,72 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
   const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
 
   return (
-    <div className="grid grid-cols-2 gap-4 mb-6">
-      <Button
-        className="w-full p-6"
-        style={{ backgroundColor: profile.background_color || '#3C8C7C' }}
-        onClick={() => setShowColorPicker('background')}
+    <div className="space-y-8">
+      <div className="grid grid-cols-2 gap-4">
+        <Button
+          className="w-full p-6 bg-black text-white hover:bg-black/90"
+          onClick={() => setShowColorPicker('background')}
+        >
+          Background Color
+          <div 
+            className="ml-2 w-6 h-6 rounded border border-white"
+            style={{ backgroundColor: profile.background_color || '#3C8C7C' }}
+          />
+        </Button>
+        <Button
+          className="w-full p-6 bg-black text-white hover:bg-black/90"
+          onClick={() => setShowColorPicker('text')}
+        >
+          Text Color
+          <div 
+            className="ml-2 w-6 h-6 rounded border border-white"
+            style={{ backgroundColor: profile.text_color || '#FFFFFF' }}
+          />
+        </Button>
+        <Button
+          className="w-full p-6 bg-black text-white hover:bg-black/90"
+          onClick={() => setShowColorPicker('button')}
+        >
+          Button Color
+          <div 
+            className="ml-2 w-6 h-6 rounded border border-white"
+            style={{ backgroundColor: profile.button_color || '#8899ac' }}
+          />
+        </Button>
+        <Button
+          className="w-full p-6 bg-black text-white hover:bg-black/90"
+          onClick={() => setShowColorPicker('buttonText')}
+        >
+          Button Text Color
+          <div 
+            className="ml-2 w-6 h-6 rounded border border-white"
+            style={{ backgroundColor: profile.button_text_color || '#000000' }}
+          />
+        </Button>
+      </div>
+
+      {/* Color Preview Section */}
+      <div 
+        className="p-6 rounded-lg"
+        style={{ 
+          backgroundColor: profile.background_color || '#3C8C7C',
+          color: profile.text_color || '#FFFFFF'
+        }}
       >
-        Background Color
-      </Button>
-      <Button
-        className="w-full p-6"
-        style={{ backgroundColor: profile.text_color || '#FFFFFF' }}
-        onClick={() => setShowColorPicker('text')}
-      >
-        Text Color
-      </Button>
-      <Button
-        className="w-full p-6"
-        style={{ backgroundColor: profile.button_color || '#8899ac' }}
-        onClick={() => setShowColorPicker('button')}
-      >
-        Button Color
-      </Button>
-      <Button
-        className="w-full p-6"
-        style={{ backgroundColor: profile.button_text_color || '#000000' }}
-        onClick={() => setShowColorPicker('buttonText')}
-      >
-        Button Text Color
-      </Button>
+        <h3 className="text-lg font-semibold mb-4">Color Preview</h3>
+        <p className="mb-4">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </p>
+        <Button
+          className="w-full"
+          style={{ 
+            backgroundColor: profile.button_color || '#8899ac',
+            color: profile.button_text_color || '#000000'
+          }}
+        >
+          Example Button
+        </Button>
+      </div>
 
       {showColorPicker && (
         <ColorPicker

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { BasicProfileInfo } from "./BasicProfileInfo";
 import { ContactInfo } from "./ContactInfo";
 import { SocialMediaLinks } from "./SocialMediaLinks";
+import { ColorPickerSection } from "./ColorPickerSection";
 
 interface ProfileFormProps {
   profile: Tables<"nfc_profiles">;
@@ -68,6 +69,14 @@ export const ProfileForm = ({
       <BasicProfileInfo defaultValues={profile} />
       <ContactInfo defaultValues={profile} />
       <SocialMediaLinks defaultValues={profile} />
+      
+      <div className="pt-8 border-t">
+        <h2 className="text-lg font-semibold mb-6">Appearance Settings</h2>
+        <ColorPickerSection 
+          profile={profile}
+          onColorChange={onUpdate}
+        />
+      </div>
     </form>
   );
 };
