@@ -56,6 +56,17 @@ const CodeRedirect = () => {
             return;
           }
 
+          // Record the visit before redirecting
+          console.log('Recording visit for review plaque:', nfcCode.id);
+          const { error: visitError } = await supabase
+            .from('profile_visits')
+            .insert({ profile_id: nfcCode.id });
+
+          if (visitError) {
+            console.error('Error recording visit:', visitError);
+            // Continue with redirect even if visit recording fails
+          }
+
           // Redirect to the plaque's redirect URL
           console.log('Redirecting to review plaque URL:', nfcCode.redirect_url);
           window.location.href = nfcCode.redirect_url;
