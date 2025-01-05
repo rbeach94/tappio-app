@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,8 +11,6 @@ export const ReviewPlaqueForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     businessName: "",
-    location: "",
-    description: "",
     websiteUrl: "",
   });
 
@@ -36,8 +33,6 @@ export const ReviewPlaqueForm = () => {
       if (data) {
         setFormData({
           businessName: data.title || "",
-          location: "",  // Location is not stored yet
-          description: data.description || "",
           websiteUrl: data.redirect_url || "",
         });
       }
@@ -62,7 +57,6 @@ export const ReviewPlaqueForm = () => {
         .from("nfc_codes")
         .update({
           title: formData.businessName,
-          description: formData.description,
           redirect_url: formData.websiteUrl,
         })
         .eq("code", code);
@@ -99,34 +93,6 @@ export const ReviewPlaqueForm = () => {
             <p className="text-sm text-muted-foreground mt-1">
               This name will be displayed on your dashboard and review URL
             </p>
-          </div>
-
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium mb-1">
-              Location
-            </label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-              placeholder="Enter business location (optional)"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1">
-              Description
-            </label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Enter a description for your review plaque (optional)"
-            />
           </div>
 
           <div>
