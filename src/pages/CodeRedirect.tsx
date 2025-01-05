@@ -52,9 +52,10 @@ const CodeRedirect = () => {
           return;
         }
 
-        // Redirect to the profile URL
-        console.log('Redirecting to:', nfcCode.url);
-        window.location.href = nfcCode.url;
+        // Construct and redirect to the profile URL
+        const profileUrl = `/profile/${nfcCode.url}/view`;
+        console.log('Redirecting to:', profileUrl);
+        navigate(profileUrl);
         
       } catch (error) {
         console.error('Unexpected error during redirect:', error);
