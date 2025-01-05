@@ -60,7 +60,7 @@ const CodeRedirect = () => {
           .from('nfc_profiles')
           .select('id')
           .eq('code_id', nfcCode.id)
-          .single();
+          .maybeSingle();  // Changed from .single() to .maybeSingle()
 
         console.log('Profile query result:', { profile, profileError });
 
@@ -71,8 +71,8 @@ const CodeRedirect = () => {
         }
 
         if (!profile) {
-          console.error('No profile found for code:', code);
-          navigate('/');
+          console.log('No profile found, redirecting to activate page');
+          navigate(`/activate/${code}`);
           return;
         }
 
