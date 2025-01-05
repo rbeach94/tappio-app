@@ -22,7 +22,7 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="bg-background border-b">
+    <nav className="bg-background border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex space-x-2 md:space-x-4 items-center overflow-x-auto">
