@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, PencilIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ProfileCardProps {
   profile: {
@@ -17,6 +19,28 @@ interface ProfileCardProps {
 
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
   const navigate = useNavigate();
+
+  const handleEditClick = async () => {
+    console.log('Updating NFC code URL for profile:', profile.id);
+    
+    // Update the NFC code URL with the profile ID
+    const { error } = await supabase
+      .from('nfc_codes')
+      .update({ 
+        url: profile.id,
+        is_active: true 
+      })
+      .eq('code', profile.nfc_codes?.code);
+
+    if (error) {
+      console.error('Error updating NFC code URL:', error);
+      toast.error("Failed to update NFC code URL");
+      return;
+    }
+
+    console.log('Successfully updated NFC code URL');
+    navigate(`/profile/${profile.id}`);
+  };
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -35,7 +59,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => navigate(`/profile/${profile.id}`)}
+            onClick={handleEditClick}
           >
             <PencilIcon className="h-4 w-4" />
           </Button>
