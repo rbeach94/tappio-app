@@ -9,7 +9,7 @@ const CodeRedirect = () => {
 
   useEffect(() => {
     const redirectToProfile = async () => {
-      console.log('Attempting to redirect for code:', code);
+      console.log('Starting redirect process for code:', code);
       
       if (!code) {
         console.error('No code provided');
@@ -18,14 +18,14 @@ const CodeRedirect = () => {
       }
 
       try {
-        // First, get the NFC code details using maybeSingle() instead of single()
+        // First, get the NFC code details
         const { data: nfcCode, error: nfcError } = await supabase
           .from('nfc_codes')
-          .select('id, assigned_to, url')
+          .select('id, assigned_to, url, is_active')
           .eq('code', code)
           .maybeSingle();
 
-        console.log('NFC code data:', nfcCode, 'Error:', nfcError);
+        console.log('NFC code query result:', { nfcCode, nfcError });
 
         // If there was a database error
         if (nfcError) {
@@ -41,9 +41,9 @@ const CodeRedirect = () => {
           return;
         }
 
-        // If the code exists but is not assigned
-        if (!nfcCode.assigned_to) {
-          console.log('Code not assigned, redirecting to activate page');
+        // If the code exists but is not assigned or not active
+        if (!nfcCode.assigned_to || !nfcCode.is_active) {
+          console.log('Code not assigned or inactive, redirecting to activate page');
           navigate(`/activate/${code}`);
           return;
         }
@@ -62,8 +62,16 @@ const CodeRedirect = () => {
           .eq('code_id', nfcCode.id)
           .single();
 
-        if (profileError || !profile) {
+        console.log('Profile query result:', { profile, profileError });
+
+        if (profileError) {
           console.error('Error fetching profile:', profileError);
+          navigate('/');
+          return;
+        }
+
+        if (!profile) {
+          console.error('No profile found for code:', code);
           navigate('/');
           return;
         }
@@ -72,7 +80,7 @@ const CodeRedirect = () => {
         console.log('Redirecting to profile:', profile.id);
         navigate(`/profile/${profile.id}/view`);
       } catch (error) {
-        console.error('Error during redirect:', error);
+        console.error('Unexpected error during redirect:', error);
         navigate('/');
       }
     };
