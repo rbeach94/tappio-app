@@ -20,13 +20,19 @@ const CodeRedirect = () => {
       try {
         const { data: nfcCode, error } = await supabase
           .from('nfc_codes')
-          .select('id')
+          .select('id, assigned_to')
           .eq('code', code)
           .single();
 
         if (error || !nfcCode) {
           console.error('Error fetching NFC code:', error);
           navigate('/');
+          return;
+        }
+
+        // If the code is not assigned, redirect to activate page
+        if (!nfcCode.assigned_to) {
+          navigate(`/activate/${code}`);
           return;
         }
 

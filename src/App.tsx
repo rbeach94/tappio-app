@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import ViewProfile from "./pages/ViewProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import CodeRedirect from "./pages/CodeRedirect";
+import Activate from "./pages/Activate";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/c/:code" element={<CodeRedirect />} />
+          <Route path="/activate/:code" element={<Activate />} />
           <Route
             path="/dashboard"
             element={
