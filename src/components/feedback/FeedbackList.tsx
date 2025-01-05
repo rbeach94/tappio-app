@@ -41,7 +41,7 @@ export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
         .from("feedback")
         .select(
           isAdmin
-            ? `*, profiles:user_id(email)`
+            ? `*, profiles(email)`
             : "*"
         );
 
