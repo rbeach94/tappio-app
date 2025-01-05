@@ -15,12 +15,13 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
       <div className="grid grid-cols-2 gap-4">
         <div className="relative">
           <Button
-            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            className="w-full p-6 bg-black text-white hover:bg-black/90 flex flex-col items-center gap-2"
             onClick={() => setShowColorPicker('background')}
           >
-            Background Color
+            <span>Background</span>
+            <span>Color</span>
             <div 
-              className="ml-2 w-6 h-6 rounded border border-white"
+              className="w-6 h-6 rounded border border-white mt-1"
               style={{ backgroundColor: profile.background_color || '#3C8C7C' }}
             />
           </Button>
@@ -38,12 +39,13 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
         
         <div className="relative">
           <Button
-            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            className="w-full p-6 bg-black text-white hover:bg-black/90 flex flex-col items-center gap-2"
             onClick={() => setShowColorPicker('text')}
           >
-            Text Color
+            <span>Text</span>
+            <span>Color</span>
             <div 
-              className="ml-2 w-6 h-6 rounded border border-white"
+              className="w-6 h-6 rounded border border-white mt-1"
               style={{ backgroundColor: profile.text_color || '#FFFFFF' }}
             />
           </Button>
@@ -61,12 +63,13 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
 
         <div className="relative">
           <Button
-            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            className="w-full p-6 bg-black text-white hover:bg-black/90 flex flex-col items-center gap-2"
             onClick={() => setShowColorPicker('button')}
           >
-            Button Color
+            <span>Button</span>
+            <span>Color</span>
             <div 
-              className="ml-2 w-6 h-6 rounded border border-white"
+              className="w-6 h-6 rounded border border-white mt-1"
               style={{ backgroundColor: profile.button_color || '#8899ac' }}
             />
           </Button>
@@ -84,12 +87,13 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
 
         <div className="relative">
           <Button
-            className="w-full p-6 bg-black text-white hover:bg-black/90"
+            className="w-full p-6 bg-black text-white hover:bg-black/90 flex flex-col items-center gap-2"
             onClick={() => setShowColorPicker('buttonText')}
           >
-            Button Text Color
+            <span>Button Text</span>
+            <span>Color</span>
             <div 
-              className="ml-2 w-6 h-6 rounded border border-white"
+              className="w-6 h-6 rounded border border-white mt-1"
               style={{ backgroundColor: profile.button_text_color || '#000000' }}
             />
           </Button>
