@@ -42,9 +42,29 @@ const CodeRedirect = () => {
           return;
         }
 
-        // If the code exists but is not assigned or not active
+        // Handle review plaque type
+        if (nfcCode.type === 'review') {
+          console.log('Review plaque detected:', nfcCode);
+          
+          // If the plaque is not active or has no redirect URL
+          if (!nfcCode.is_active || !nfcCode.redirect_url) {
+            console.log('Review plaque not active or no redirect URL:', { 
+              is_active: nfcCode.is_active,
+              redirect_url: nfcCode.redirect_url
+            });
+            navigate(`/activate/${code}`);
+            return;
+          }
+
+          // Redirect to the plaque's redirect URL
+          console.log('Redirecting to review plaque URL:', nfcCode.redirect_url);
+          window.location.href = nfcCode.redirect_url;
+          return;
+        }
+
+        // Handle profile type (existing logic)
         if (!nfcCode.is_active || !nfcCode.url) {
-          console.log('Code not active or no URL:', { 
+          console.log('Profile not active or no URL:', { 
             is_active: nfcCode.is_active,
             url: nfcCode.url
           });
