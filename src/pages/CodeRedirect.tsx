@@ -22,7 +22,7 @@ const CodeRedirect = () => {
         console.log('Fetching NFC code details for:', code);
         const { data: nfcCode, error: nfcError } = await supabase
           .from('nfc_codes')
-          .select('*')  // Changed to select all columns for debugging
+          .select('*')
           .eq('code', code)
           .maybeSingle();
 
@@ -44,7 +44,10 @@ const CodeRedirect = () => {
 
         // If the code exists but is not assigned or not active
         if (!nfcCode.assigned_to || !nfcCode.is_active) {
-          console.log('Code not assigned or inactive, redirecting to activate page');
+          console.log('Code not assigned or inactive:', { 
+            assigned_to: nfcCode.assigned_to, 
+            is_active: nfcCode.is_active 
+          });
           navigate(`/activate/${code}`);
           return;
         }
@@ -58,13 +61,12 @@ const CodeRedirect = () => {
 
         // Fallback: Get the profile ID and construct the URL
         console.log('Fetching profile for code_id:', nfcCode.id);
-        const { data: profile, error: profileError } = await supabase
+        const { data: profiles, error: profileError } = await supabase
           .from('nfc_profiles')
-          .select('*')  // Changed to select all columns for debugging
-          .eq('code_id', nfcCode.id)
-          .maybeSingle();
+          .select('*')
+          .eq('code_id', nfcCode.id);
 
-        console.log('Profile query result:', { profile, profileError });
+        console.log('Profile query result:', { profiles, profileError });
 
         if (profileError) {
           console.error('Error fetching profile:', profileError);
@@ -72,8 +74,16 @@ const CodeRedirect = () => {
           return;
         }
 
+        // Get the most recently created profile if multiple exist
+        const profile = profiles && profiles.length > 0 
+          ? profiles[0] 
+          : null;
+
         if (!profile) {
-          console.log('No profile found, redirecting to activate page');
+          console.log('No profile found for assigned code:', {
+            code_id: nfcCode.id,
+            assigned_to: nfcCode.assigned_to
+          });
           navigate(`/activate/${code}`);
           return;
         }
