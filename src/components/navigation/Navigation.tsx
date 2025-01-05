@@ -24,11 +24,16 @@ export const Navigation = () => {
     }
   };
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsOpen(false); // Close the mobile menu after navigation
+  };
+
   const navigationItems = [
-    { icon: Home, label: "Home", onClick: () => navigate("/") },
-    { icon: LayoutDashboard, label: "Dashboard", onClick: () => navigate("/dashboard") },
-    { icon: Settings, label: "Admin", onClick: () => navigate("/admin") },
-    { icon: MessageSquare, label: "Feedback", onClick: () => navigate("/feedback") },
+    { icon: Home, label: "Home", path: "/" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+    { icon: Settings, label: "Admin", path: "/admin" },
+    { icon: MessageSquare, label: "Feedback", path: "/feedback" },
   ];
 
   return (
@@ -41,7 +46,7 @@ export const Navigation = () => {
                 key={item.label}
                 variant="ghost"
                 className="flex items-center space-x-2"
-                onClick={item.onClick}
+                onClick={() => handleNavigation(item.path)}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>
@@ -50,7 +55,7 @@ export const Navigation = () => {
           </div>
 
           <div className="md:hidden flex items-center">
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
@@ -63,10 +68,7 @@ export const Navigation = () => {
                       key={item.label}
                       variant="ghost"
                       className="flex items-center justify-start space-x-2 w-full"
-                      onClick={() => {
-                        item.onClick();
-                        setIsOpen(false);
-                      }}
+                      onClick={() => handleNavigation(item.path)}
                     >
                       <item.icon className="h-5 w-5" />
                       <span>{item.label}</span>
@@ -89,7 +91,7 @@ export const Navigation = () => {
             <Button
               variant="ghost"
               className="flex items-center space-x-2"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => handleNavigation("/dashboard")}
             >
               <LayoutDashboard className="h-5 w-5" />
               <span className="hidden md:inline">Dashboard</span>

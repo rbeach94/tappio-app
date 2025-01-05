@@ -41,6 +41,13 @@ export const AuthForm = ({ mode = "login" }: { mode?: "login" | "signup" }) => {
 
         if (data.user) {
           toast.success("Successfully signed up! Please check your email for verification.");
+          // After successful signup, also redirect to dashboard
+          if (!data.session?.user.email_confirmed_at) {
+            // If email confirmation is required
+            toast.info("Please check your email to verify your account before logging in.");
+          } else {
+            navigate("/dashboard", { replace: true });
+          }
         }
       }
     } catch (error: any) {
