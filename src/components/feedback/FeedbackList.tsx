@@ -35,8 +35,6 @@ export const FeedbackList = ({ isAdmin = false }: FeedbackListProps) => {
   const { data: feedback, isLoading } = useQuery({
     queryKey: ["feedback", isAdmin],
     queryFn: async () => {
-      // If admin, fetch all feedback with user emails
-      // If regular user, fetch only their feedback
       const query = supabase
         .from("feedback")
         .select(
