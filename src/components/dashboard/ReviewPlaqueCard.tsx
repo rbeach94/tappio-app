@@ -38,26 +38,9 @@ export const ReviewPlaqueCard = ({ plaque }: ReviewPlaqueCardProps) => {
     },
   });
 
-  const handleEditClick = async () => {
-    console.log('Updating review plaque URL:', plaque.id);
-    
-    // Update the plaque URL
-    const { error } = await supabase
-      .from('nfc_codes')
-      .update({ 
-        is_active: true,
-        redirect_url: plaque.redirect_url 
-      })
-      .eq('id', plaque.id);
-
-    if (error) {
-      console.error('Error updating plaque URL:', error);
-      toast.error("Failed to update plaque URL");
-      return;
-    }
-
-    console.log('Successfully updated plaque URL');
-    navigate(`/plaque/${plaque.id}`);
+  const handleEditClick = () => {
+    console.log('Navigating to review plaque:', plaque.code);
+    navigate(`/plaque/${plaque.code}`);
   };
 
   return (

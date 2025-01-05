@@ -14,6 +14,7 @@ import ViewProfile from "./pages/ViewProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import CodeRedirect from "./pages/CodeRedirect";
 import Activate from "./pages/Activate";
+import { ReviewPlaqueForm } from "./components/review/ReviewPlaqueForm";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/plaque/:code"
+            element={
+              <ProtectedRoute>
+                <ReviewPlaqueForm />
               </ProtectedRoute>
             }
           />
