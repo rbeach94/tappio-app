@@ -128,6 +128,42 @@ export type Database = {
           },
         ]
       }
+      profile_button_clicks: {
+        Row: {
+          button_id: string
+          created_at: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          button_id: string
+          created_at?: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          button_id?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_button_clicks_button_id_fkey"
+            columns: ["button_id"]
+            isOneToOne: false
+            referencedRelation: "profile_buttons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_button_clicks_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_buttons: {
         Row: {
           action_type: string
@@ -159,6 +195,32 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profile_buttons_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_visits: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_visits_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "nfc_profiles"

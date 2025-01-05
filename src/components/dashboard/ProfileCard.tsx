@@ -4,6 +4,7 @@ import { Eye, PencilIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProfileCardProps {
   profile: {
@@ -19,6 +20,44 @@ interface ProfileCardProps {
 
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
   const navigate = useNavigate();
+
+  // Fetch visit count
+  const { data: visitCount } = useQuery({
+    queryKey: ['profile-visits', profile.id],
+    queryFn: async () => {
+      console.log('Fetching visit count for profile:', profile.id);
+      const { count, error } = await supabase
+        .from('profile_visits')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_id', profile.id);
+      
+      if (error) {
+        console.error('Error fetching visit count:', error);
+        throw error;
+      }
+      
+      return count || 0;
+    },
+  });
+
+  // Fetch click count
+  const { data: clickCount } = useQuery({
+    queryKey: ['profile-clicks', profile.id],
+    queryFn: async () => {
+      console.log('Fetching click count for profile:', profile.id);
+      const { count, error } = await supabase
+        .from('profile_button_clicks')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_id', profile.id);
+      
+      if (error) {
+        console.error('Error fetching click count:', error);
+        throw error;
+      }
+      
+      return count || 0;
+    },
+  });
 
   const handleEditClick = async () => {
     console.log('Updating NFC code URL for profile:', profile.id);
@@ -66,20 +105,33 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-1">
-          <p className="text-lg font-medium">
-            {profile.full_name || "Unnamed Profile"}
-          </p>
-          {profile.job_title && (
-            <p className="text-sm text-muted-foreground">
-              {profile.job_title}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <p className="text-lg font-medium">
+              {profile.full_name || "Unnamed Profile"}
             </p>
-          )}
-          {profile.company && (
-            <p className="text-sm text-muted-foreground">
-              {profile.company}
-            </p>
-          )}
+            {profile.job_title && (
+              <p className="text-sm text-muted-foreground">
+                {profile.job_title}
+              </p>
+            )}
+            {profile.company && (
+              <p className="text-sm text-muted-foreground">
+                {profile.company}
+              </p>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{visitCount || 0}</p>
+              <p className="text-xs text-muted-foreground">Profile Views</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{clickCount || 0}</p>
+              <p className="text-xs text-muted-foreground">Button Clicks</p>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
