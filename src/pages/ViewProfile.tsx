@@ -6,12 +6,32 @@ import { SaveContactButton } from "@/components/profile/view/SaveContactButton";
 import { ProfileButtons } from "@/components/profile/view/ProfileButtons";
 import { ProfileBio } from "@/components/profile/view/ProfileBio";
 import { useProfileData } from "@/hooks/useProfileData";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ViewProfile = () => {
   const { id } = useParams<{ id: string }>();
   console.log('ViewProfile component mounted with id:', id);
 
   const { profile, buttons, isLoading, error } = useProfileData(id!);
+
+  // Record visit when profile is loaded
+  useEffect(() => {
+    const recordVisit = async () => {
+      if (profile?.id) {
+        console.log('Recording visit for profile:', profile.id);
+        const { error } = await supabase
+          .from('profile_visits')
+          .insert({ profile_id: profile.id });
+        
+        if (error) {
+          console.error('Error recording visit:', error);
+        }
+      }
+    };
+
+    recordVisit();
+  }, [profile?.id]);
 
   if (error) {
     return (
