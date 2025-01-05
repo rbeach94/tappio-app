@@ -7,6 +7,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { ProfileCard } from "@/components/dashboard/ProfileCard";
+import { ReviewPlaqueCard } from "@/components/dashboard/ReviewPlaqueCard";
 import { AddCardDialog } from "@/components/dashboard/AddCardDialog";
 
 const Dashboard = () => {
@@ -48,6 +49,21 @@ const Dashboard = () => {
     },
   });
 
+  // Fetch user's review plaques
+  const { data: reviewPlaques, isLoading: plaquesLoading } = useQuery({
+    queryKey: ["reviewPlaques"],
+    queryFn: async () => {
+      const { data: plaques, error } = await supabase
+        .from("nfc_codes")
+        .select("*")
+        .eq("type", "review")
+        .eq("assigned_to", (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+      return plaques;
+    },
+  });
+
   // Mutation to assign code to user
   const assignCodeMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -80,15 +96,17 @@ const Dashboard = () => {
 
       if (updateError) throw updateError;
 
-      // Create initial profile
-      const { error: profileError } = await supabase
-        .from("nfc_profiles")
-        .insert({
-          user_id: user.id,
-          code_id: codeRecord.id
-        });
+      // Create initial profile if it's a profile type code
+      if (codeRecord.type === 'profile') {
+        const { error: profileError } = await supabase
+          .from("nfc_profiles")
+          .insert({
+            user_id: user.id,
+            code_id: codeRecord.id
+          });
 
-      if (profileError) throw profileError;
+        if (profileError) throw profileError;
+      }
 
       return codeRecord;
     },
@@ -108,6 +126,9 @@ const Dashboard = () => {
     navigate("/login");
   };
 
+  const isLoading = profilesLoading || plaquesLoading;
+  const hasNoItems = (!profiles || profiles.length === 0) && (!reviewPlaques || reviewPlaques.length === 0);
+
   return (
     <div className="min-h-screen p-4 md:p-8 page-transition">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -126,7 +147,7 @@ const Dashboard = () => {
         </div>
         
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Your Tappio Cards</h2>
+          <h2 className="text-xl font-semibold">Your Tappio Cards & Review Plaques</h2>
           <AddCardDialog
             isOpen={isAddingCard}
             onOpenChange={setIsAddingCard}
@@ -135,20 +156,23 @@ const Dashboard = () => {
           />
         </div>
 
-        {profilesLoading ? (
+        {isLoading ? (
           <div className="flex justify-center">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
-        ) : profiles?.length === 0 ? (
+        ) : hasNoItems ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
-              You haven't added any Tappio cards yet. Click "Add Tappio Card" to get started.
+              You haven't added any Tappio cards or review plaques yet. Click "Add Tappio Card" to get started.
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {profiles?.map((profile) => (
               <ProfileCard key={profile.id} profile={profile} />
+            ))}
+            {reviewPlaques?.map((plaque) => (
+              <ReviewPlaqueCard key={plaque.id} plaque={plaque} />
             ))}
           </div>
         )}
