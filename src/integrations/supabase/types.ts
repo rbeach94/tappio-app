@@ -16,8 +16,12 @@ export type Database = {
           code: string
           created_at: string
           created_by: string | null
+          description: string | null
           id: string
           is_active: boolean | null
+          redirect_url: string | null
+          title: string | null
+          type: string
           url: string | null
         }
         Insert: {
@@ -26,8 +30,12 @@ export type Database = {
           code: string
           created_at?: string
           created_by?: string | null
+          description?: string | null
           id?: string
           is_active?: boolean | null
+          redirect_url?: string | null
+          title?: string | null
+          type?: string
           url?: string | null
         }
         Update: {
@@ -36,8 +44,12 @@ export type Database = {
           code?: string
           created_at?: string
           created_by?: string | null
+          description?: string | null
           id?: string
           is_active?: boolean | null
+          redirect_url?: string | null
+          title?: string | null
+          type?: string
           url?: string | null
         }
         Relationships: []
@@ -269,26 +281,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_nfc_codes: {
-        Args: {
-          count: number
-          admin_id: string
-        }
-        Returns: {
-          assigned_at: string | null
-          assigned_to: string | null
-          code: string
-          created_at: string
-          created_by: string | null
-          id: string
-          is_active: boolean | null
-          url: string | null
-        }[]
-      }
-      generate_unique_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_nfc_codes:
+        | {
+            Args: {
+              count: number
+              admin_id: string
+            }
+            Returns: {
+              assigned_at: string | null
+              assigned_to: string | null
+              code: string
+              created_at: string
+              created_by: string | null
+              description: string | null
+              id: string
+              is_active: boolean | null
+              redirect_url: string | null
+              title: string | null
+              type: string
+              url: string | null
+            }[]
+          }
+        | {
+            Args: {
+              count: number
+              admin_id: string
+              code_type?: string
+            }
+            Returns: {
+              assigned_at: string | null
+              assigned_to: string | null
+              code: string
+              created_at: string
+              created_by: string | null
+              description: string | null
+              id: string
+              is_active: boolean | null
+              redirect_url: string | null
+              title: string | null
+              type: string
+              url: string | null
+            }[]
+          }
+      generate_unique_code:
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: string
+          }
+        | {
+            Args: {
+              code_length?: number
+            }
+            Returns: string
+          }
     }
     Enums: {
       app_role: "admin" | "user"
