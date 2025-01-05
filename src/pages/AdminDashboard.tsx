@@ -110,32 +110,6 @@ const AdminDashboard = () => {
     enabled: userRole === "admin",
   });
 
-  const handleDownloadCSV = (codes: NFCCode[], prefix: string) => {
-    if (!codes) return;
-
-    const availableCodes = codes.filter(code => !code.assigned_to);
-    const csvContent = [
-      ["Code", "URL", "Created At"],
-      ...availableCodes.map(code => [
-        code.code,
-        code.url,
-        new Date(code.created_at).toLocaleDateString()
-      ])
-    ]
-      .map(row => row.join(","))
-      .join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute("download", `${prefix}-codes-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   // Generate NFC codes mutation
   const generateNFCCodesMutation = useMutation({
     mutationFn: async (count: number) => {
@@ -202,6 +176,32 @@ const AdminDashboard = () => {
   const handleGenerateReviewCodes = async (count: number) => {
     setIsGeneratingReview(true);
     generateReviewCodesMutation.mutate(count);
+  };
+
+  const handleDownloadCSV = (codes: NFCCode[], prefix: string) => {
+    if (!codes) return;
+
+    const availableCodes = codes.filter(code => !code.assigned_to);
+    const csvContent = [
+      ["Code", "URL", "Created At"],
+      ...availableCodes.map(code => [
+        code.code,
+        code.url,
+        new Date(code.created_at).toLocaleDateString()
+      ])
+    ]
+      .map(row => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", `${prefix}-codes-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   useEffect(() => {
