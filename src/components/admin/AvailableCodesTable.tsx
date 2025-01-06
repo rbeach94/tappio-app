@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
 import type { NFCCode } from '@/pages/AdminDashboard';
 
 interface AvailableCodesTableProps {
@@ -39,7 +39,17 @@ const AvailableCodesTable = ({ codes, onDownloadCSV }: AvailableCodesTableProps)
         <TableBody>
           {availableCodes.map((code) => (
             <TableRow key={code.id}>
-              <TableCell className="font-mono">{code.code}</TableCell>
+              <TableCell className="font-mono">
+                <a 
+                  href={`/c/${code.code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-blue-600 hover:underline"
+                >
+                  {code.code}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </TableCell>
               <TableCell>
                 <a 
                   href={code.url || ''} 
