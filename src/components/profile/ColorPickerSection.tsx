@@ -69,15 +69,15 @@ export const ColorPickerSection = ({ profile, onColorChange }: ColorPickerSectio
         <p className="mb-4">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
-        <button
-          className="w-full px-4 py-2 rounded transition-colors"
+        <div
+          className="w-full px-4 py-2 rounded transition-colors cursor-default"
           style={{ 
             backgroundColor: profile.button_color || '#8899ac',
             color: profile.button_text_color || '#000000'
           }}
         >
           Example Button
-        </button>
+        </div>
       </div>
     </div>
   );
