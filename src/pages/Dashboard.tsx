@@ -7,8 +7,7 @@ import { DashboardActions } from "@/components/dashboard/DashboardActions";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 const Dashboard = () => {
-  const [isAddingCard, setIsAddingCard] = useState(false);
-  const [isAddingPlaque, setIsAddingPlaque] = useState(false);
+  const [isAddingItem, setIsAddingItem] = useState(false);
 
   // Fetch user role
   const { data: userRole } = useQuery({
@@ -116,7 +115,7 @@ const Dashboard = () => {
     },
     onSuccess: () => {
       toast.success("Card added successfully!");
-      setIsAddingCard(false);
+      setIsAddingItem(false);
       refetchProfiles();
     },
     onError: (error) => {
@@ -132,10 +131,8 @@ const Dashboard = () => {
         <DashboardHeader userRole={userRole} />
         
         <DashboardActions
-          isAddingCard={isAddingCard}
-          setIsAddingCard={setIsAddingCard}
-          isAddingPlaque={isAddingPlaque}
-          setIsAddingPlaque={setIsAddingPlaque}
+          isAddingItem={isAddingItem}
+          setIsAddingItem={setIsAddingItem}
           assignCodeMutation={assignCodeMutation}
         />
 

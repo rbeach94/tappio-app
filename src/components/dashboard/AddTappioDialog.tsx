@@ -11,52 +11,59 @@ import {
 } from "@/components/ui/dialog";
 import { UseMutationResult } from "@tanstack/react-query";
 
-interface AddCardDialogProps {
+interface AddTappioDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   assignCodeMutation: UseMutationResult<any, Error, string>;
-  onAddCard: () => void;
+  onAdd: () => void;
 }
 
-export const AddCardDialog = ({ 
+export const AddTappioDialog = ({ 
   isOpen, 
   onOpenChange, 
   assignCodeMutation, 
-  onAddCard 
-}: AddCardDialogProps) => {
+  onAdd 
+}: AddTappioDialogProps) => {
   const [code, setCode] = useState("");
+  const isReviewCode = code.length === 8;
+  const isCardCode = code.length === 6;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>Add Tappio Card</Button>
+        <Button>Add Tappio</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Tappio Card</DialogTitle>
+          <DialogTitle>Add New Tappio Item</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <Input
-            placeholder="Enter your 6-character code"
+            placeholder="Enter your 6 or 8-character code"
             value={code}
-            onChange={(e) => setCode(e.target.value)}
-            maxLength={6}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            maxLength={8}
           />
+          <p className="text-sm text-muted-foreground">
+            {isCardCode && "This code will add a Tappio Card"}
+            {isReviewCode && "This code will add a Review Plaque"}
+            {!isCardCode && !isReviewCode && "Enter a 6-digit code for a Tappio Card or an 8-digit code for a Review Plaque"}
+          </p>
           <Button 
             onClick={() => {
               assignCodeMutation.mutate(code);
-              onAddCard();
+              onAdd();
             }}
-            disabled={assignCodeMutation.isPending}
+            disabled={assignCodeMutation.isPending || (!isCardCode && !isReviewCode)}
             className="w-full"
           >
             {assignCodeMutation.isPending ? (
               <>
-                <Loader2 className="animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Adding...
               </>
             ) : (
-              "Add Card"
+              "Add Item"
             )}
           </Button>
         </div>
