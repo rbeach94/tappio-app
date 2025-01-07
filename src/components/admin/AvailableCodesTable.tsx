@@ -29,29 +29,12 @@ const AvailableCodesTable = ({ codes, onDownloadCSV }: AvailableCodesTableProps)
         width: 300
       });
 
-      // Convert SVG to EPS-like format (since direct EPS conversion isn't available)
-      const eps = `%!PS-Adobe-3.0 EPSF-3.0
-%%BoundingBox: 0 0 300 300
-%%EndComments
-/m { moveto } def
-/l { lineto } def
-${qrSvg
-  .replace(/<svg[^>]*>/, '')
-  .replace(/<\/svg>/, '')
-  .replace(/<path[^d]*d="([^"]*)"[^>]*>/g, '$1')
-  .replace(/M/g, 'm')
-  .replace(/L/g, 'l')
-  .replace(/Z/g, 'closepath')}
-stroke
-showpage
-%%EOF`;
-
-      // Create and download the EPS file
-      const blob = new Blob([eps], { type: 'application/postscript' });
+      // Create and download the SVG file
+      const blob = new Blob([qrSvg], { type: 'image/svg+xml' });
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `qr-code-${url.split('/').pop()}.eps`;
+      a.download = `qr-code-${url.split('/').pop()}.svg`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
