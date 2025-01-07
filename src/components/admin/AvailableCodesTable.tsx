@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, ExternalLink } from "lucide-react";
 import type { NFCCode } from '@/pages/AdminDashboard';
+import QRCode from 'qrcode';
 
 interface AvailableCodesTableProps {
   codes: NFCCode[];
@@ -18,6 +19,47 @@ interface AvailableCodesTableProps {
 
 const AvailableCodesTable = ({ codes, onDownloadCSV }: AvailableCodesTableProps) => {
   const availableCodes = codes.filter(code => !code.assigned_to).slice(0, 10);
+
+  const handleQRDownload = async (url: string) => {
+    try {
+      // Generate QR code as SVG
+      const qrSvg = await QRCode.toString(url, {
+        type: 'svg',
+        margin: 1,
+        width: 300
+      });
+
+      // Convert SVG to EPS-like format (since direct EPS conversion isn't available)
+      const eps = `%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 0 0 300 300
+%%EndComments
+/m { moveto } def
+/l { lineto } def
+${qrSvg
+  .replace(/<svg[^>]*>/, '')
+  .replace(/<\/svg>/, '')
+  .replace(/<path[^d]*d="([^"]*)"[^>]*>/g, '$1')
+  .replace(/M/g, 'm')
+  .replace(/L/g, 'l')
+  .replace(/Z/g, 'closepath')}
+stroke
+showpage
+%%EOF`;
+
+      // Create and download the EPS file
+      const blob = new Blob([eps], { type: 'application/postscript' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `qr-code-${url.split('/').pop()}.eps`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -32,7 +74,7 @@ const AvailableCodesTable = ({ codes, onDownloadCSV }: AvailableCodesTableProps)
         <TableHeader>
           <TableRow>
             <TableHead>Code</TableHead>
-            <TableHead>URL</TableHead>
+            <TableHead>QR</TableHead>
             <TableHead>Created At</TableHead>
           </TableRow>
         </TableHeader>
@@ -51,14 +93,15 @@ const AvailableCodesTable = ({ codes, onDownloadCSV }: AvailableCodesTableProps)
                 </a>
               </TableCell>
               <TableCell>
-                <a 
-                  href={code.url || ''} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleQRDownload(`${window.location.origin}/c/${code.code}`)}
+                  className="text-blue-600 hover:text-blue-800"
                 >
-                  {code.url}
-                </a>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download QR
+                </Button>
               </TableCell>
               <TableCell>{new Date(code.created_at).toLocaleDateString()}</TableCell>
             </TableRow>
