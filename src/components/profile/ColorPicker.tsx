@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ChromePicker } from 'react-color';
 import { X } from "lucide-react";
 
@@ -13,31 +12,28 @@ interface ColorPickerProps {
 
 export const ColorPicker = ({ label, color, onChange, isOpen, onToggle, onClose }: ColorPickerProps) => {
   return (
-    <div className="w-1/2 px-1 relative">
-      <Button
-        onClick={onToggle}
-        className="w-full mb-2"
-        style={{
-          backgroundColor: color,
-          color: '#000000'
-        }}
-      >
+    <div className="flex items-center space-x-4 w-full relative">
+      <label className="block text-sm font-medium mb-2 dark:text-white">
         {label}
-      </Button>
+      </label>
+      <div 
+        onClick={onToggle}
+        className="w-10 h-10 rounded border cursor-pointer flex items-center justify-center"
+        style={{ backgroundColor: color }}
+      />
       {isOpen && (
-        <div className="absolute left-0 top-[calc(100%-0.5rem)] z-50 bg-white p-2 rounded-lg shadow-lg">
+        <div className="absolute left-0 top-[calc(100%+0.5rem)] z-50 bg-white p-2 rounded-lg shadow-lg">
           <div className="flex justify-end mb-2">
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
+              type="button"
               onClick={() => {
                 onToggle();
                 onClose?.();
               }}
-              className="h-6 w-6"
+              className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm dark:focus:ring-gray-700 dark:focus:ring-offset-gray-800"
             >
               <X className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
           <ChromePicker
             color={color}

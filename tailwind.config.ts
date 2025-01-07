@@ -7,6 +7,7 @@ export default {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    'node_modules/preline/dist/*.js',
   ],
   prefix: "",
   theme: {
@@ -84,5 +85,8 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('preline/plugin'),
+  ],
 } satisfies Config;
