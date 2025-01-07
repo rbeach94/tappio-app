@@ -76,7 +76,7 @@ const ViewProfile = () => {
 
   return (
     <div 
-      className="min-h-screen p-4"
+      className="min-h-screen p-4 pt-16 md:pt-4" // Added pt-16 for mobile and pt-4 for desktop
       style={{
         backgroundColor: profile.background_color || '#15202B',
         color: profile.text_color || '#FFFFFF',
